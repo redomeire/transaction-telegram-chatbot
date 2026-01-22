@@ -1,0 +1,23 @@
+# .gitignore standard untuk Yarn 4 + node-modules linker
+
+# Build outputs
+dist/
+build/
+
+# Node modules (karena kita set linker ke node-modules)
+node_modules/
+
+auth_info
+
+# Yarn Specifics
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Environment variables
+.env
+transaction-whatsapp-*
