@@ -1,8 +1,11 @@
 version: '3.8'
 services:
+  services:
   wa-gateway:
-    image: localhost/wa-gateway:latest
-    build: .
+    image: wa-gateway-app:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: wa-gateway
     restart: always
     tty: true
