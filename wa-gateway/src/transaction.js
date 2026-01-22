@@ -8,7 +8,7 @@ const createTransaction = async ({
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/api/transaction/create`,
+        url: `${baseUrl}/google-sheet/create`,
         options: {
             method: 'POST',
             headers: {
