@@ -1,29 +1,49 @@
+import { fetcher } from "./utils/api.js";
+
 const baseUrl = process.env.VERCEL_API_URL;
 
 const createTransaction = async ({
     text,
-    sender,
-    onSuccess,
-    onError
+    sock,
+    m
 }) => {
-    const response = await fetch(`${baseUrl}/create`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.VERCEL_API_KEY
+    const response = await fetcher({
+        url: `${baseUrl}/api/transaction/create`,
+        options: {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text }),
         },
-        body: JSON.stringify({ text, sender })
+        onLoading: async () => {
+            await sock.sendMessage(m.key.remoteJid, {
+                react: {
+                    text: '⏳',
+                    key: m.key
+                }
+            })
+        },
+        onSuccess: async () => {
+            await sock.sendMessage(m.key.remoteJid, {
+                react: {
+                    text: '✅',
+                    key: m.key
+                }
+            })
+        },
+        onError: async () => {
+            await sock.sendMessage(m.key.remoteJid, {
+                react: {
+                    text: '❌',
+                    key: m.key
+                }
+            })
+        }
     })
-
-    const data = await response.json();
-    if (response.ok) {
-        if (onSuccess) onSuccess(data);
-    } else {
-        if (onError) onError(data);
-    }
-    return { response, data };
+    return response;
 }
-const updateTransaction = async (id) => {}
-const deleteTransaction = async (id) => { }
+const updateTransaction = async ({ text, sock, m }) => {}
+const deleteTransaction = async ({ text, sock, m }) => { }
 
 export { createTransaction, updateTransaction, deleteTransaction };

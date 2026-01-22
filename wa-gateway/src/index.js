@@ -50,22 +50,9 @@ async function connectToWhatsapp() {
                 continue;
             } else if (command in transactionsCommands) {
                 await transactionsCommands[command]({
-                    onSuccess: async (data) => {
-                        await sock.sendMessage(m.key.remoteJid, {
-                            react: {
-                                text: '✅',
-                                key: m.key
-                            }
-                        })
-                    },
-                    onError: async (error) => {
-                        await sock.sendMessage(m.key.remoteJid, {
-                            react: {
-                                text: '❌',
-                                key: m.key
-                            }
-                        })
-                    },
+                    text: msgContent,
+                    sock,
+                    m
                 });
             } else {
                 await sock.sendMessage(m.key.remoteJid, {
