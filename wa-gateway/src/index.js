@@ -5,6 +5,9 @@ import makeWASocket, {
 import pino from 'pino';
 import qrcode from 'qrcode-terminal';
 import { commands, transactionsCommands } from "./commands.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function connectToWhatsapp() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
@@ -40,7 +43,10 @@ async function connectToWhatsapp() {
             const msgContent = m.message?.conversation || m.message?.extendedTextMessage?.text;
 
             if (!msgContent || !msgContent.startsWith('!')) continue;
-            const command = msgContent.slice(1).trim().toLowerCase();
+            const args = msgContent.slice(1).trim().split(/ +/);
+
+            const command = args.shift().toLowerCase();
+            const restOfWords = args.join(' ');
             console.log('received command:', command);
 
             if (command in commands) {
@@ -50,22 +56,9 @@ async function connectToWhatsapp() {
                 continue;
             } else if (command in transactionsCommands) {
                 await transactionsCommands[command]({
-                    onSuccess: async (data) => {
-                        await sock.sendMessage(m.key.remoteJid, {
-                            react: {
-                                text: '✅',
-                                key: m.key
-                            }
-                        })
-                    },
-                    onError: async (error) => {
-                        await sock.sendMessage(m.key.remoteJid, {
-                            react: {
-                                text: '❌',
-                                key: m.key
-                            }
-                        })
-                    },
+                    text: restOfWords,
+                    sock,
+                    m
                 });
             } else {
                 await sock.sendMessage(m.key.remoteJid, {
