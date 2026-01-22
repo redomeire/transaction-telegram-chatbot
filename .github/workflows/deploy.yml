@@ -3,6 +3,8 @@ name: Deploy WA Gateway (Debian 12)
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'wa-gateway/**'
 
 jobs:
   deploy-vps:
@@ -20,16 +22,18 @@ jobs:
         key: ${{ secrets.VPS_KEY }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          cd /root/wa-gateway 
+          cd /root/transaction-whatsapp-chatbot
+
+          echo "Menarik kode terbaru..."
+          git pull origin main
+
+          cd wa-gateway
           
           if ! command -v podman-compose &> /dev/null; then
               echo "Menginstall podman-compose via APT..."
               export DEBIAN_FRONTEND=noninteractive
               apt-get update && apt-get install -y podman-compose
           fi
-          
-          echo "Menarik kode terbaru..."
-          git pull origin main
           
           echo "Membangun ulang container..."
           podman-compose up -d --build
