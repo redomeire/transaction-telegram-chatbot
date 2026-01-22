@@ -1,14 +1,17 @@
 export class GoogleSheetController {
-    constructor(googleSheetService) {
+    constructor(googleSheetService, aiAgentService) {
         this.googleSheetService = googleSheetService;
+        this.aiAgentService = aiAgentService;
         this.createNewRow = this.createNewRow.bind(this);
     }
 
     async createNewRow(req, res) {
         try {
-            const { judul, kategori, keterangan } = req.body;
+            const { text } = req.body;
+            const { judul, harga, kategori, keterangan } = await this.aiAgentService.analyzePrompt({ text });
             const result = await this.googleSheetService.addNewRow({
                 judul,
+                harga,
                 kategori,
                 keterangan
             });

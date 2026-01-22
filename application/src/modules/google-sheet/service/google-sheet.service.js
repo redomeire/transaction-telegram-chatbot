@@ -5,19 +5,20 @@ export class GoogleSheetService {
         this.googleClient = googleClient;
     }
     
-    async addNewRow({ judul, kategori, keterangan }) {
+    async addNewRow({ judul, harga, kategori, keterangan }) {
         const doc = await this.googleClient.getDoc();
         let sheet = doc.sheetsByTitle[this.getSheetName()];
 
         if (sheet === undefined) {
             sheet = await doc.addSheet({
                 title: this.getSheetName(),
-                headerValues: ['Timestamp', 'Judul', 'Kategori', 'Keterangan']
+                headerValues: ['Timestamp', 'Judul', 'Harga', 'Kategori', 'Keterangan']
             });
         }
         const newRow = {
             Timestamp: new Date().toISOString(),
             Judul: judul,
+            Harga: harga,
             Kategori: kategori,
             Keterangan: keterangan
         };
