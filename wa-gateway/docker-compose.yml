@@ -1,9 +1,8 @@
 version: '3.8'
 services:
-  services:
   wa-gateway:
     image: wa-gateway-app:latest
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: wa-gateway
