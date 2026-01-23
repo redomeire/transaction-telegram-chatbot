@@ -1,4 +1,4 @@
-import { fetcher } from "./utils/api.js";
+import { fetcher } from "../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
@@ -43,7 +43,5 @@ const createTransaction = async ({
     })
     return response;
 }
-const updateTransaction = async ({ text, sock, m }) => {}
-const deleteTransaction = async ({ text, sock, m }) => { }
 
-export { createTransaction, updateTransaction, deleteTransaction };
+export { createTransaction };

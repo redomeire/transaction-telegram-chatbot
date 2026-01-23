@@ -6,7 +6,7 @@ export const fetcher = async ({ url, options, onSuccess, onError, onLoading }) =
         await onError(data);
     }
     if (!response.ok) {
-        throw new Error(data.message || 'An error occurred while fetching data.');
+        throw new Error(JSON.stringify(data) || 'An error occurred while fetching data.');
     }
     if (onSuccess) await onSuccess(data);
     return data;
