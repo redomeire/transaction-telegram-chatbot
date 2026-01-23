@@ -1,8 +1,9 @@
 import { authpath } from '../utils/path.js';
 import { connectionInstance } from '../core/connection.js';
 import { DisconnectReason } from "@whiskeysockets/baileys";
-import fs from 'fs';
+import fs from 'fs/promises';
 import qrcode from 'qrcode-terminal';
+import path from 'path';
 
 export default async function onConnectionUpdate(update) {
     const { connection, lastDisconnect, qr } = update;
@@ -14,15 +15,27 @@ export default async function onConnectionUpdate(update) {
     if (connection === 'close') {
         const shouldReconnect = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut
         console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect)
-        if (lastDisconnect.error?.output?.statusCode === 401) {
-            console.log("Session expired. Deleting auth files...");
-            fs.rmSync(authpath, { recursive: true, force: true });
-            await connectionInstance.disconnect();
+        if (!shouldReconnect) {
+            console.log("You logged out. Deleting auth files...");
+            try {
+                const files = await fs.readdir(authpath);
+                if (files.length > 0) {
+                    const deletePromises = files.map(file => 
+                        fs.rm(path.join(authpath, file), {
+                            recursive: true,
+                            force: true
+                        })
+                    )
+                    await Promise.all(deletePromises);
+                    console.log(`✅ Berhasil menghapus file sesi.`);
+                }
+            } catch (error) {
+                console.error("Gagal menghapus file sesi:", error);
+            } finally {
+                process.exit(1);
+            }
         }
-        // reconnect if not logged out
-        if (shouldReconnect) {
-            await connectionInstance.connect();
-        }
+        else await connectionInstance.connect();
     } else if (connection === 'open') {
         console.log('opened connection')
     }
