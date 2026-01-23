@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -24,21 +21,30 @@ jobs:
         script: |
           cd /root/transaction-whatsapp-chatbot
 
-          echo "Menarik kode terbaru..."
+          echo "📥 Menarik kode terbaru..."
           git pull origin main
 
           cd wa-gateway
-          
-          if ! command -v podman-compose &> /dev/null; then
-              echo "Menginstall podman-compose via APT..."
-              export DEBIAN_FRONTEND=noninteractive
-              apt-get update && apt-get install -y podman-compose
-          fi
-          
-          echo "Membangun ulang container..."
-          podman-compose up -d --build
+
+          echo "🏗️ Membangun image..."
+          podman build -t wa-gateway-app:latest .
+
+          echo "🧹 Membersihkan container lama..."
+          podman rm -f wa-gateway || true
+
+          echo "🚀 Menjalankan container..."
+          podman run -d \
+            --name wa-gateway \
+            --restart always \
+            --network host \
+            --memory="512m" \
+            --memory-swap="1g" \
+            --log-opt max-size=10mb \
+            --env-file .env \
+            -v ./auth_info:/app/auth_info:Z \
+            wa-gateway-app:latest
 
           podman image prune -f
-          
-          echo "Deploy di Debian 12 Sukses!"
+
+          echo "✅ Deploy Sukses! Cek status:"
           podman ps
