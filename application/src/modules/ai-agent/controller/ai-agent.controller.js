@@ -8,7 +8,7 @@ export class AIAgentController{
     async analyzePrompt(req, res) {
         try {
             const { text } = req.body;
-            const result = await this.aiAgentService.analyzePrompt({
+            const result = await this.aiAgentService.analyzePromptCreate({
                 text
             });
             res.status(200).json({

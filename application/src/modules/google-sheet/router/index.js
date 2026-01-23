@@ -9,5 +9,8 @@ const googleSheetController = new GoogleSheetController(googleSheetService, aiAg
 
 const router = express.Router();
 router.post('/create', googleSheetController.createNewRow)
+router.get('/read', googleSheetController.getLatestRows);
+router.put('/update/:id', googleSheetController.updateRow);
+router.delete('/delete/:id', googleSheetController.deleteRow);
 
 export { router as googleSheetRouter };

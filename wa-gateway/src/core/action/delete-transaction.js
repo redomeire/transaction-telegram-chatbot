@@ -2,19 +2,18 @@ import { fetcher } from "../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const createTransaction = async ({
-    text,
+const deleteTransaction = async ({
+    id,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/create`,
+        url: `${baseUrl}/google-sheet/delete/${id}`,
         options: {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }),
+            }
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -24,15 +23,12 @@ const createTransaction = async ({
                 }
             })
         },
-        onSuccess: async (data) => {
+        onSuccess: async () => {
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
                     key: m.key
                 }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `✅ *Transaksi Berhasil Disimpan!*\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: Rp ${data.data.Harga}\n📝 Judul: ${data.data.Judul}\n_Ketik !edit [id] [nilai_baru] untuk mengubah._`
             })
         },
         onError: async () => {
@@ -47,4 +43,4 @@ const createTransaction = async ({
     return response;
 }
 
-export { createTransaction };
+export { deleteTransaction };

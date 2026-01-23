@@ -2,19 +2,18 @@ import { fetcher } from "../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const createTransaction = async ({
-    text,
+const getLatestTransaction = async ({
+    limit = 5,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/create`,
+        url: `${baseUrl}/google-sheet/read?limit=${limit}`,
         options: {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text }),
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -32,7 +31,7 @@ const createTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `✅ *Transaksi Berhasil Disimpan!*\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: Rp ${data.data.Harga}\n📝 Judul: ${data.data.Judul}\n_Ketik !edit [id] [nilai_baru] untuk mengubah._`
+                text: `🤖[Bot Transaction] \n Berikut ${limit} transaksi terbaru anda:\n\n${data.data.map((tx, index) => `${index + 1}. ${tx.ID} - ${tx.Tanggal} - ${tx.Judul} - ${tx.Harga}`).join('\n')}`
             })
         },
         onError: async () => {
@@ -47,4 +46,4 @@ const createTransaction = async ({
     return response;
 }
 
-export { createTransaction };
+export { getLatestTransaction };
