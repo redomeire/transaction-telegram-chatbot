@@ -9,14 +9,13 @@ export class MessageService {
         for (const m of event.messages) {
             const msgContent = m.message?.conversation || m.message?.extendedTextMessage?.text;
             if (!msgContent || !msgContent.startsWith('!')) continue;
-            const { command: commandName, restOfWords } = this.trimMessage(msgContent);
+            const { commandName, args } = this.trimMessage(msgContent);
 
             const command = commandService.getCommand(commandName);
 
-            console.log(`Received command: ${commandName} with args: ${restOfWords}`);
             if (command) {
                 try {
-                    await command.execute(this.sock, m, restOfWords);
+                    await command.execute(this.sock, m, args);
                 } catch (error) {
                     console.error(`Error executing command "${commandName}":`, error);
                 }
@@ -30,9 +29,7 @@ export class MessageService {
 
     trimMessage(msgContent) {
         const args = msgContent.slice(1).trim().split(/ +/);
-        const command = args.shift().toLowerCase();
-        const restOfWords = args.join(' ');
-
-        return { command, restOfWords }
+        const commandName = args.shift().toLowerCase();
+        return { commandName, args }
     }
 }

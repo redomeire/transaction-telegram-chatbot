@@ -13,8 +13,7 @@ class GoogleClient {
 
     async getDoc() {
         if (this.doc) return this.doc;
-        const doc = 
-        new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, this.serviceAccountAuth);
+        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, this.serviceAccountAuth);
         await doc.loadInfo();
         this.doc = doc;
         return this.doc;

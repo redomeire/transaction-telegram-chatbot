@@ -6,7 +6,8 @@ class CreateTransactionCommand {
         this.description = 'Create a new transaction';
     }
 
-    async execute(sock, m, restOfWords, ...args) {
+    async execute(sock, m, ...args) {
+        const restOfWords = args.join(' ');
         await createTransaction({
             text: restOfWords,
             sock,

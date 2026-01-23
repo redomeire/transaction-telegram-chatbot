@@ -5,7 +5,34 @@ export default class HelpCommand {
     }
 
     async execute(sock, m, ...args) {
-        const message = `🤖 [Bot Assistant]: Berikut adalah daftar perintah yang dapat digunakan \n\n 1. *!help*: tampil daftar perintah \n 2. *!create*: membuat transaksi baru`
+        const message = `
+  🤖 *WA-GATEWAY ASSISTANT* 🤖
+
+Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yang tersedia:
+
+🛠 *PERINTAH DASAR*
+• *!help*
+  Menampilkan daftar bantuan ini.
+
+📝 *TRANSAKSI*
+• *!create [deskripsi] [nominal]*
+  _Contoh: !create Nasi Goreng 15000_
+
+• *!get [limit]*
+  Melihat transaksi terbaru.
+  _Contoh: !get 5_
+
+• *!update [id] [nilai_baru]*
+  Update nominal/deskripsi (ID didapat dari !get).
+  _Contoh: !update 10 Beli Mobil_
+
+• *!delete [id]*
+  Menghapus transaksi secara permanen.
+  _Contoh: !delete 10_
+
+━━━━━━━━━━━━━━
+💡 *Tips:* Gunakan ID yang tertera pada pesan sukses atau hasil *!get* untuk melakukan update/delete.
+`.trim();
         await sock.sendMessage(m.key.remoteJid, { text: message }, { quoted: m });
     }
 }
