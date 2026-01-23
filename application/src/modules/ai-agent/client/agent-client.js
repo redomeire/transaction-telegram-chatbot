@@ -1,8 +1,11 @@
-import { GoogleGenAI } from '@google/genai';
+import { OpenAI } from 'openai';
 
 class AgentClient {
     constructor() {
-        this.client = new GoogleGenAI({ apiKey: process.env.AGENT_API_KEY });
+        this.client = new OpenAI({
+            apiKey: process.env.AGENT_API_KEY,
+            baseURL: process.env.AGENT_API_BASE_URL
+        })
     }
 }
 

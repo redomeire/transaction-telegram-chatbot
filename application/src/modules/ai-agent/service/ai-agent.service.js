@@ -14,12 +14,28 @@ export class AIAgentService {
             Teks: "${text}"
         `;
 
-        const result = await this.agentClient.client.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt
+        const result = await this.agentClient.client.chat.completions.create({
+            model: 'deepseek-chat',
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt
+                }
+            ],
+            response_format: {
+                type: 'json_object'
+            }
         });
-        const cleanText = result.text.replace(/```json|```/g, "").trim();
+        
+        const rawContent = result.choices[0].message.content;
+        const jsonString = rawContent.replace(/```json|```/g, "").trim();
+        const data = JSON.parse(jsonString);
 
-        return JSON.parse(cleanText);
+        return {
+            judul: data.judul || "-",
+            harga: Number(data.harga) || 0,
+            kategori: data.kategori || "pengeluaran",
+            keterangan: data.keterangan || ""
+        };
     }
 }
