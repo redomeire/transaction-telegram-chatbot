@@ -7,7 +7,8 @@ class UpdateTransactionCommand {
     }
 
     async execute(sock, m, ...args) {
-        const id = args[0];
+        const firstArrayElement = args[0];
+        const id = firstArrayElement[0];
         const restOfWords = args.join(' ').replace(id, '').trim();
         await updateTransaction({
             id,
