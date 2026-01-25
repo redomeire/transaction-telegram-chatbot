@@ -26,7 +26,7 @@ export class GoogleSheetController {
                 }
             });
         } catch (error) {
-            res.status(500).json({ error: true, error: error.message });
+            res.status(500).json({ error: true, message: error.message });
         }
     }
 
@@ -50,7 +50,7 @@ export class GoogleSheetController {
                 data: result
             });
         } catch (error) {
-            res.status(500).json({ error: true, error: error.message });
+            res.status(500).json({ error: true, message: error.message });
         }
     }
 
@@ -69,7 +69,7 @@ export class GoogleSheetController {
                 data: result
             });
         } catch (error) {
-            res.status(500).json({ error: true, error: error.message });
+            res.status(500).json({ error: true, message: error.message });
         }
     }
 
@@ -83,7 +83,7 @@ export class GoogleSheetController {
                 data: result
             });
         } catch (error) {
-            res.status(500).json({ error: true, error: error.message });
+            res.status(500).json({ error: true, message: error.message });
         }
     }
 }
