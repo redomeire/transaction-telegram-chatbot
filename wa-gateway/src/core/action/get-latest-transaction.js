@@ -34,12 +34,15 @@ const getLatestTransaction = async ({
                 text: `🤖[Bot Transaction] \n Berikut ${limit} transaksi terbaru anda:\n\n${data.data.map((tx, index) => `${index + 1}. ${tx.ID ?? ''} - ${tx.Tanggal ?? ''} - ${tx.Judul} - ${tx.Harga}`).join('\n')}`
             })
         },
-        onError: async () => {
+        onError: async (error) => {
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '❌',
                     key: m.key
                 }
+            })
+            await sock.sendMessage(m.key.remoteJid, {
+                text: `🤖[Bot Transaction] \n\nGagal mendapatkan transaksi.\n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
