@@ -1,4 +1,5 @@
 import { fetcher } from "../../utils/api.js";
+import { rupiahFormatter } from "../../utils/rupiahformatter.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
@@ -32,7 +33,7 @@ const createTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `✅ *Transaksi Berhasil Disimpan!*\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: Rp ${data.data.Harga}\n📝 Judul: ${data.data.Judul}\n_Ketik !edit [id] [nilai_baru] untuk mengubah._`
+                text: `🤖[Bot Transaction] \n\n✅ Transaksi Berhasil Disimpan!\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}\n\n_Ketik !update [id] [nilai_baru] untuk mengubah._`
             })
         },
         onError: async (error) => {
