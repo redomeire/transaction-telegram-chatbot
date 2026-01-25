@@ -41,9 +41,7 @@ export class GoogleSheetController {
             }
             const result = await this.cacheService.handleArrayOfObjects(
                 `transaction-${this.googleSheetService.getSheetName()}`,
-                this.googleSheetService.getLatestRows.bind(this.googleSheetService,
-                    { limit: limit ? parseInt(limit) : 10 }
-                ),
+                this.googleSheetService.getLatestRows.bind(this.googleSheetService),
                 limit
             )
             res.status(200).json({

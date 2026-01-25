@@ -31,7 +31,7 @@ class CacheClient {
                 } catch (error) {
                     console.error('Error setting data in Redis:', error);
                 }
-                return freshData;
+                return [...freshData].slice(0, limit);
             }
             return cachedData.map(item => {
                 const parsedItem = JSON.parse(item);
