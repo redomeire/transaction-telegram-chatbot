@@ -31,12 +31,15 @@ const deleteTransaction = async ({
                 }
             })
         },
-        onError: async () => {
+        onError: async (error) => {
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '❌',
                     key: m.key
                 }
+            })
+            await sock.sendMessage(m.key.remoteJid, {
+                text: `🤖[Bot Transaction] \n\nGagal menghapus transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
