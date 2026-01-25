@@ -31,7 +31,7 @@ const getLatestTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n Berikut ${limit} transaksi terbaru anda:\n\n${data.data.map((tx, index) => `${index + 1}. ${tx.ID} - ${tx.Tanggal} - ${tx.Judul} - ${tx.Harga}`).join('\n')}`
+                text: `🤖[Bot Transaction] \n Berikut ${limit} transaksi terbaru anda:\n\n${data.data.map((tx, index) => `${index + 1}. ${tx.ID ?? ''} - ${tx.Tanggal ?? ''} - ${tx.Judul} - ${tx.Harga}`).join('\n')}`
             })
         },
         onError: async () => {

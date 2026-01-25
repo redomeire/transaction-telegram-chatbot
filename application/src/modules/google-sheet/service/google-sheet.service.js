@@ -28,7 +28,7 @@ export class GoogleSheetService {
         return newRow;
     }
 
-    async getLatestRows({ limit }) {
+    async getLatestRows() {
         const doc = await this.googleClient.getDoc();
         let sheet = doc.sheetsByTitle[this.getSheetName()];
 
@@ -38,7 +38,6 @@ export class GoogleSheetService {
         const rows = await sheet.getRows();
         
         const latestRows = rows
-            .slice(-limit)
             .reverse()
             .map(row => ({
                 ID: row.get('ID') ?? '',
