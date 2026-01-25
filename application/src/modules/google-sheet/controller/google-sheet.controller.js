@@ -1,9 +1,11 @@
 import { dateformatter } from "../../../utils/dateformatter.js";
 
 export class GoogleSheetController {
-    constructor(googleSheetService, aiAgentService) {
+    constructor(googleSheetService, aiAgentService, cacheService) {
         this.googleSheetService = googleSheetService;
         this.aiAgentService = aiAgentService;
+        this.cacheService = cacheService;
+
         this.createNewRow = this.createNewRow.bind(this);
         this.updateRow = this.updateRow.bind(this);
         this.getLatestRows = this.getLatestRows.bind(this);
@@ -37,9 +39,13 @@ export class GoogleSheetController {
                     message: 'Limit must be a number and not greater than 10'
                 });
             }
-            const result = await this.googleSheetService.getLatestRows({
-                limit: limit || 5
-            });
+            const result = await this.cacheService.handleArrayOfObjects(
+                `transaction-${this.googleSheetService.getSheetName()}`,
+                this.googleSheetService.getLatestRows.bind(this.googleSheetService,
+                    { limit: limit ? parseInt(limit) : 10 }
+                ),
+                limit
+            )
             res.status(200).json({
                 error: false,
                 message: 'Latest rows fetched successfully',
