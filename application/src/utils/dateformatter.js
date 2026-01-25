@@ -1,4 +1,5 @@
 export const dateformatter = (dateString) => {
+    if (!dateString || dateString === '') return '';
     const date = new Date(dateString);
     const formattedDate = new Intl.DateTimeFormat('id-ID', {
         day: '2-digit',

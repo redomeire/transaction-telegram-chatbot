@@ -41,8 +41,8 @@ export class GoogleSheetService {
             .slice(-limit)
             .reverse()
             .map(row => ({
-                ID: row.get('ID'),
-                Tanggal: dateformatter(row.get('Timestamp')),
+                ID: row.get('ID') ?? '',
+                Tanggal: dateformatter(row.get('Timestamp') ?? ''),
                 Judul: row.get('Judul'),
                 Harga: row.get('Harga'),
                 Kategori: row.get('Kategori'),
