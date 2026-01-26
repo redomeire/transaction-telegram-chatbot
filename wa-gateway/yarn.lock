@@ -519,6 +519,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-cron@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "node-cron@npm:4.2.1"
+  checksum: 10c0/804df01df230e96fd2f8ffcde004f4d5af953bccdf3ccf993dc450526dd65f553a2f2ad4bc0faf55c90c38cbc99c9ddbb88ee16cba3fc6bc74e606da6efb249e
+  languageName: node
+  linkType: hard
+
 "nodemailer@npm:^7.0.12":
   version: 7.0.12
   resolution: "nodemailer@npm:7.0.12"
@@ -873,6 +880,7 @@ __metadata:
     "@types/qrcode": "npm:^1.5.6"
     "@whiskeysockets/baileys": "npm:^7.0.0-rc.9"
     dotenv: "npm:^17.2.3"
+    node-cron: "npm:^4.2.1"
     nodemailer: "npm:^7.0.12"
     pino: "npm:^10.2.1"
     qrcode: "npm:^1.5.4"

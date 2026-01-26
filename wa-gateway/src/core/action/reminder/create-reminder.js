@@ -1,20 +1,20 @@
-import { fetcher } from "../../utils/api.js";
-import { rupiahFormatter } from "../../utils/rupiahformatter.js";
+import { fetcher } from "../../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const getLatestTransaction = async ({
-    limit = 5,
+const createReminder = async ({
+    text,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/read?limit=${limit}`,
+        url: `${baseUrl}/reminder/create`,
         options: {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ text }),
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -25,6 +25,7 @@ const getLatestTransaction = async ({
             })
         },
         onSuccess: async (data) => {
+            console.log(data);
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
@@ -32,7 +33,7 @@ const getLatestTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nBerikut ${limit !== -1 ? limit : 'semua'} transaksi terbaru anda di bulan ini:\n\n${data.data.map((tx, index) => `${index + 1}. *${tx.ID ?? 'undefined'}*\n📅 Tanggal : ${tx.Tanggal ?? ''}\n💰 Nominal: ${rupiahFormatter(tx.Harga)}\n📝 Judul: ${tx.Judul}\n`).join('\n')}`
+                text: `🤖[Bot Transaction] \n\n✅ Reminder baru berhasil dibuat!`
             })
         },
         onError: async (error) => {
@@ -43,11 +44,11 @@ const getLatestTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mendapatkan transaksi.\n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal membuat reminder. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
     return response;
 }
 
-export { getLatestTransaction };
+export { createReminder };

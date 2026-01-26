@@ -1,21 +1,19 @@
-import { fetcher } from "../../utils/api.js";
-import { rupiahFormatter } from "../../utils/rupiahformatter.js";
+import { fetcher } from "../../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const createTransaction = async ({
-    text,
+const deleteTransaction = async ({
+    id,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/create`,
+        url: `${baseUrl}/google-sheet/delete/${id}`,
         options: {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }),
+            }
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -25,15 +23,12 @@ const createTransaction = async ({
                 }
             })
         },
-        onSuccess: async (data) => {
+        onSuccess: async () => {
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
                     key: m.key
                 }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Transaksi Berhasil Disimpan!\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}\n\n_Ketik !update [id] [nilai_baru] untuk mengubah._`
             })
         },
         onError: async (error) => {
@@ -44,11 +39,11 @@ const createTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal menyimpan transaksi. \n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal menghapus transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
     return response;
 }
 
-export { createTransaction };
+export { deleteTransaction };

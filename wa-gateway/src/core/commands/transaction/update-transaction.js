@@ -1,4 +1,4 @@
-import { updateTransaction } from "../action/update-transaction.js";
+import { updateTransaction } from "../../action/transaction/update-transaction.js";
 
 class UpdateTransactionCommand {
     constructor() {

@@ -1,4 +1,4 @@
-import { deleteTransaction } from "../action/delete-transaction.js";
+import { deleteTransaction } from "../../action/transaction/delete-transaction.js";
 
 class DeleteTransactionCommand {
     constructor() {
