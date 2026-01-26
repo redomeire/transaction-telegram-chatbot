@@ -18,7 +18,7 @@ class CacheClient {
     async handleArrayOfObjects(key, cb, limit = 10) {
         try {
             const cachedData = await this.client.lRange(key, 0, limit - 1);
-            if (!cachedData || cachedData.length === 0) {
+            if ((!cachedData || cachedData.length === 0) && cb) {
                 const freshData = await cb();
                 const serializedData = freshData.map(item => JSON.stringify(item));
                 try {
