@@ -1,4 +1,5 @@
 import { cronService } from "../../../services/cron.service";
+import { getReminder } from "../../action/reminder/get-reminder";
 
 export default class GetReminderCommand {
     constructor() {
@@ -7,15 +8,7 @@ export default class GetReminderCommand {
     }
 
     async execute(sock, m, ...args) {
-        try {
-            const crons = cronService.crons.keys();
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Current Reminders:\n\n${[...crons].map((name, index) => `${index + 1}. ${name}`).join('\n') || 'No reminders found.'}`
-            })
-        } catch (error) {
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mendapatkan daftar reminder. \n\nError: ${error.message || 'Unknown error'}`
-            })
-        }
+        const limit = parseInt(args[0]) || 5;
+        await getReminder({ sock, m, limit });
     }
 }
