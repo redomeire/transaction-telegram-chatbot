@@ -9,13 +9,16 @@ class CommandService {
 
     async init() {
         const commandsPath = path.join(dirname, '../core/commands');
-        const files = fs.readdirSync(commandsPath);
-        for (const file of files) {
-            if (file.endsWith('.js')) {
-                const module = await import(`file://${path.join(commandsPath, file)}`)
+        const entries = fs.readdirSync(commandsPath, { recursive: true, withFileTypes: true });
+        for (const entry of entries) {
+            if (entry.isFile() && entry.name.endsWith('.js')) {
+                const fullPath = path.join(entry.path, entry.name);
+                const module = await import(`file://${fullPath}`);
                 const CommandClass = module.default;
-                const cmd = new CommandClass();
-                this.commands.set(cmd.name, cmd);
+                if (CommandClass) {
+                    const cmd = new CommandClass();
+                    this.commands.set(cmd.name, cmd);
+                }
             }
         }
         console.log(`Loaded ${this.commands.size} commands.`);

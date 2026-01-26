@@ -1,4 +1,4 @@
-import { deleteReminder } from "../../action/reminder/delete-reminder";
+import { deleteReminder } from "../../action/reminder/delete-reminder.js";
 
 export default class DeleteReminderCommand {
     constructor() {

@@ -1,3 +1,4 @@
+import { cronService } from "../../../services/cron.service.js";
 import { fetcher } from "../../../utils/api.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
@@ -30,6 +31,7 @@ const deleteReminder = async ({
                     key: m.key
                 }
             })
+            cronService.removeCron(`reminder-${id}`);
         },
         onError: async (error) => {
             await sock.sendMessage(m.key.remoteJid, {

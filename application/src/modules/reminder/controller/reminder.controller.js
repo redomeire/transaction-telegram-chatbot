@@ -35,21 +35,30 @@ export class ReminderController {
             const { limit } = req.query;
             const results = [];
             const cacheClient = this.cacheService.getClient();
+            console.log('Fetching reminders with limit:', limit, ' type:', typeof limit);
 
-            for await (const key of cacheClient.scanIterator({
-                MATCH: 'reminders*',
+            for await (const rawKey of cacheClient.scanIterator({
+                MATCH: 'reminders:*',
                 COUNT: limit || 30
             })) {
+                const key = Array.isArray(rawKey) ? rawKey[0] : rawKey;
+                if (!key || typeof key !== 'string') {
+                    console.log('Invalid key encountered:', key);
+                    continue;
+                }
                 const reminder = await cacheClient.hGetAll(key);
-                if (Object.keys(reminder).length === 0) continue;
                 results.push(reminder);
             }
+            console.log(results);
+            if (results.length === 0)
+                return res.status(404).json({ error: true, message: 'No reminders found' });
             res.status(200).json({
                 error: false,
                 message: 'Reminders fetched successfully',
                 data: results
             });
         } catch (error) {
+            console.error(error);
             res.status(500).json({ error: true, message: error.message });
         }
     }
