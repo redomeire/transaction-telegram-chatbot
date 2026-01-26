@@ -12,6 +12,18 @@ export class CronService {
         this.crons.set(newCron.name, newCron);
     }
 
+    updateCron({ name, time, taskFn }) {
+        const existingCron = this.crons.get(name);
+        if (existingCron) {
+            existingCron.stop();
+            this.crons.delete(name);
+        }
+        const updatedCron = cron.schedule(time, taskFn, {
+            name
+        });
+        this.crons.set(updatedCron.name, updatedCron);
+    }
+
     startCron(name) {
         const cronJob = this.crons.get(name);
         if (!cronJob) return;
