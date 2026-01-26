@@ -14,7 +14,7 @@ export class ReminderController {
             const { text } = req.body;
             const cacheClient = this.cacheService.getClient();
 
-            const promptResult = await this.aiAgentService.analyzePromptCreateReminder({ text });
+            const promptResult = await this.aiAgentService.analyzePromptReminder({ text });
             await cacheClient.hSet(`reminders:${promptResult.id}`, {
                 id: promptResult.id,
                 nama: promptResult.nama,

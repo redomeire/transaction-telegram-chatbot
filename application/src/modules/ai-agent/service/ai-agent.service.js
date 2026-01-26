@@ -50,7 +50,7 @@ class AIAgentService {
         };
     }
 
-    async analyzePromptCreateReminder({ text, previousData }) {
+    async analyzePromptReminder({ text, previousData }) {
         const updateString = previousData ?
             `Berikut adalah data pengingat sebelumnya: ${JSON.stringify(previousData)}.` : '';
         const prompt = `
