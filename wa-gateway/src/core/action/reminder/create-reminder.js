@@ -1,15 +1,16 @@
-import { fetcher } from "../../utils/api.js";
-import { rupiahFormatter } from "../../utils/rupiahformatter.js";
+import { cronService } from "../../../services/cron.service.js";
+import { fetcher } from "../../../utils/api.js";
+import { crontime } from "../../../utils/crontime.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const createTransaction = async ({
+const createReminder = async ({
     text,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/create`,
+        url: `${baseUrl}/reminder/create`,
         options: {
             method: 'POST',
             headers: {
@@ -26,6 +27,16 @@ const createTransaction = async ({
             })
         },
         onSuccess: async (data) => {
+            console.log(data);
+            cronService.addCron({
+                name: `reminder-${data.data.id}`,
+                time: data.data.waktu,
+                taskFn: async () => {
+                    await sock.sendMessage(m.key.remoteJid, {
+                        text: `⏰ [Reminder] \n\n${data.data.pesan}`
+                    })
+                }
+            })
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
@@ -33,7 +44,7 @@ const createTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Transaksi Berhasil Disimpan!\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}\n\n_Ketik !update [id] [nilai_baru] untuk mengubah._`
+                text: `🤖[Bot Transaction] \n\n✅ Reminder baru berhasil dibuat! \n\n 🆔 ID : ${data.data.id}\n📝 Nama : ${data.data.nama}\n⌚ Waktu: ${crontime(data.data.waktu)}`
             })
         },
         onError: async (error) => {
@@ -44,11 +55,11 @@ const createTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal menyimpan transaksi. \n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal membuat reminder. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
     return response;
 }
 
-export { createTransaction };
+export { createReminder };

@@ -1,6 +1,6 @@
 import { cacheClient } from "../client/cache-client.js";
 
-export class CacheService {
+class CacheService {
     constructor() {
         this.cacheClient = cacheClient;
     }
@@ -8,4 +8,9 @@ export class CacheService {
     async handleArrayOfObjects(key, cb, limit) {
         return await this.cacheClient.handleArrayOfObjects(key, cb, limit);
     }
+
+    getClient() {
+        return this.cacheClient.client;
+    }
 }
+export const cacheService = new CacheService();

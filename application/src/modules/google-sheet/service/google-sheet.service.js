@@ -124,3 +124,4 @@ export class GoogleSheetService {
         return sheetName;
     }
 }
+export const googleSheetService = new GoogleSheetService();
