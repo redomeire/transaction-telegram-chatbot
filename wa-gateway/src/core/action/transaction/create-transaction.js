@@ -1,22 +1,21 @@
-import { fetcher } from "../../utils/api.js";
-import { rupiahFormatter } from "../../utils/rupiahformatter.js";
+import { fetcher } from "../../../utils/api.js";
+import { rupiahFormatter } from "../../../utils/rupiahformatter.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const updateTransaction = async ({
-    id,
+const createTransaction = async ({
     text,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/update/${id}`,
+        url: `${baseUrl}/google-sheet/create`,
         options: {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text }),
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -34,7 +33,7 @@ const updateTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction]\n*Transaksi Berhasil Diupdate!*\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}`
+                text: `🤖[Bot Transaction] \n\n✅ Transaksi Berhasil Disimpan!\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}\n\n_Ketik !update [id] [nilai_baru] untuk mengubah._`
             })
         },
         onError: async (error) => {
@@ -45,11 +44,11 @@ const updateTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mengupdate transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal menyimpan transaksi. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
     return response;
 }
 
-export { updateTransaction };
+export { createTransaction };

@@ -1,4 +1,4 @@
-import { getLatestTransaction } from "../action/get-latest-transaction.js";
+import { getLatestTransaction } from "../../action/transaction/get-latest-transaction.js";
 
 class GetLatestTransactionCommand {
     constructor() {

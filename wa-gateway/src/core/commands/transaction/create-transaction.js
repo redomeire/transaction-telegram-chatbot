@@ -1,4 +1,4 @@
-import { createTransaction } from "../action/create-transaction.js";
+import { createTransaction } from "../../action/transaction/create-transaction.js";
 
 class CreateTransactionCommand {
     constructor() {

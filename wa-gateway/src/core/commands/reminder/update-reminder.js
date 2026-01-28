@@ -1,16 +1,16 @@
-import { updateTransaction } from "../action/update-transaction.js";
+import { updateReminder } from "../../action/reminder/update-reminder.js";
 
-class UpdateTransactionCommand {
+class UpdateReminderCommand {
     constructor() {
-        this.name = 'update';
-        this.description = 'Update transaction';
+        this.name = 'reminder-update';
+        this.description = 'Updates an existing reminder with new details.';
     }
 
     async execute(sock, m, ...args) {
         const firstArrayElement = args[0];
         const id = firstArrayElement[0];
         const restOfWords = args.join(' ').replace(id, '').trim();
-        await updateTransaction({
+        await updateReminder({
             id,
             text: restOfWords,
             sock,
@@ -19,4 +19,4 @@ class UpdateTransactionCommand {
     }
 }
 
-export default UpdateTransactionCommand;
+export default UpdateReminderCommand;

@@ -1,6 +1,6 @@
 import { agentClient } from '../client/agent-client.js';
 import { nanoid } from 'nanoid';
-export class AIAgentService {
+class AIAgentService {
     constructor() {
         this.agentClient = agentClient;
         this.analyzePromptCreate = this.analyzePromptCreate.bind(this);
@@ -50,6 +50,29 @@ export class AIAgentService {
         };
     }
 
+    async analyzePromptReminder({ text, previousData }) {
+        const updateString = previousData ?
+            `Berikut adalah data pengingat sebelumnya: ${JSON.stringify(previousData)}.` : '';
+        const prompt = `
+            Anda adalah asisten pembuat cron job.
+            ${updateString}
+            Pengingat baru ini diberi id "${previousData? previousData.id : nanoid(8)}".
+            Ekstrak data berikut dari teks: "id", "nama", "waktu" (string pengingat dalam format *), dan "pesan".
+            asterisk pertama adalah detik (0-59), asterisk kedua adalah menit (0-59), asterisk ketiga adalah jam (0-23), asterisk keempat adalah hari dalam bulan (1-31), asterisk kelima adalah bulan (1-12), asterisk keenam adalah hari dalam minggu (0-7) dengan 0 atau 7 adalah Minggu.
+            Format JSON yang dikembalikan: {"id": string, "nama": string, "waktu": string, "pesan": string}.
+            Teks: "${text}"
+        `;
+
+        const data = await this.createCompletion({ prompt });
+
+        return {
+            id: data.id,
+            nama: data.nama || "-",
+            waktu: data.waktu || "",
+            pesan: data.pesan || ""
+        };
+    }
+
     async createCompletion({ prompt }) {
         const result = await this.agentClient.client.chat.completions.create({
             model: 'deepseek-chat',
@@ -69,3 +92,4 @@ export class AIAgentService {
         return data;
     }
 }
+export const aiAgentService = new AIAgentService();

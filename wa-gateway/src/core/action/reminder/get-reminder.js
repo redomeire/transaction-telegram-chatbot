@@ -1,19 +1,21 @@
-import { fetcher } from "../../utils/api.js";
+import { cronService } from "../../../services/cron.service.js";
+import { fetcher } from "../../../utils/api.js";
+import { crontime } from "../../../utils/crontime.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
-const deleteTransaction = async ({
-    id,
+const getReminder = async ({
+    limit,
     sock,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/delete/${id}`,
+        url: `${baseUrl}/reminder/read?limit=${limit}`,
         options: {
-            method: 'DELETE',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
         },
         onLoading: async () => {
             await sock.sendMessage(m.key.remoteJid, {
@@ -23,12 +25,15 @@ const deleteTransaction = async ({
                 }
             })
         },
-        onSuccess: async () => {
+        onSuccess: async (data) => {
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
                     key: m.key
                 }
+            })
+            await sock.sendMessage(m.key.remoteJid, {
+                text: `🤖[Bot Transaction] \n\nBerikut ${limit !== -1 ? limit : 'semua'} reminder terbaru anda:\n\n${data.data.map((reminder, index) => `${index + 1}. *${reminder.id ?? 'undefined'}*\n📝 Nama : ${reminder.nama ?? ''}\n⌚ Waktu: ${crontime(reminder.waktu)}\n`).join('\n')}`
             })
         },
         onError: async (error) => {
@@ -39,11 +44,11 @@ const deleteTransaction = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal menghapus transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal memuat. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
     return response;
 }
 
-export { deleteTransaction };
+export { getReminder };
