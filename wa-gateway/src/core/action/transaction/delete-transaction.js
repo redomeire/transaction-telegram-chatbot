@@ -1,6 +1,6 @@
 import { fetcher } from "../../../utils/api.js";
 
-const baseUrl = process.env.VERCEL_API_URL;
+const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const deleteTransaction = async ({
     id,
