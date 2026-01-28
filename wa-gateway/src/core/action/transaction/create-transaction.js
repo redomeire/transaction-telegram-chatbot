@@ -1,7 +1,7 @@
 import { fetcher } from "../../../utils/api.js";
 import { rupiahFormatter } from "../../../utils/rupiahformatter.js";
 
-const baseUrl = process.env.VERCEL_API_URL;
+const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const createTransaction = async ({
     text,
