@@ -56,10 +56,10 @@ class AIAgentService {
         const prompt = `
             Anda adalah asisten pembuat cron job.
             ${updateString}
-            Pengingat baru ini diberi id "${nanoid(8)}".
-            Ekstrak data berikut dari teks: "id", "nama", dan "waktu" (string pengingat dalam format *).
+            Pengingat baru ini diberi id "${previousData? previousData.id : nanoid(8)}".
+            Ekstrak data berikut dari teks: "id", "nama", "waktu" (string pengingat dalam format *), dan "pesan".
             asterisk pertama adalah detik (0-59), asterisk kedua adalah menit (0-59), asterisk ketiga adalah jam (0-23), asterisk keempat adalah hari dalam bulan (1-31), asterisk kelima adalah bulan (1-12), asterisk keenam adalah hari dalam minggu (0-7) dengan 0 atau 7 adalah Minggu.
-            Format JSON yang dikembalikan: {"id": string, "nama": string, "waktu": string}.
+            Format JSON yang dikembalikan: {"id": string, "nama": string, "waktu": string, "pesan": string}.
             Teks: "${text}"
         `;
 
@@ -69,6 +69,7 @@ class AIAgentService {
             id: data.id,
             nama: data.nama || "-",
             waktu: data.waktu || "",
+            pesan: data.pesan || ""
         };
     }
 

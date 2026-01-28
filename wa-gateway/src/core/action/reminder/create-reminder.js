@@ -1,5 +1,6 @@
 import { cronService } from "../../../services/cron.service.js";
 import { fetcher } from "../../../utils/api.js";
+import { crontime } from "../../../utils/crontime.js";
 
 const baseUrl = process.env.VERCEL_API_URL;
 
@@ -27,6 +28,15 @@ const createReminder = async ({
         },
         onSuccess: async (data) => {
             console.log(data);
+            cronService.addCron({
+                name: `reminder-${data.data.id}`,
+                time: data.data.waktu,
+                taskFn: async () => {
+                    await sock.sendMessage(m.key.remoteJid, {
+                        text: `⏰ [Reminder] \n\n${data.data.pesan}`
+                    })
+                }
+            })
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
@@ -34,16 +44,7 @@ const createReminder = async ({
                 }
             })
             await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Reminder baru berhasil dibuat!`
-            })
-            cronService.addCron({
-                name: `reminder-${data.id}`,
-                time: data.waktu,
-                taskFn: async () => {
-                    await sock.sendMessage(m.key.remoteJid, {
-                        text: `⏰ [Reminder] \n\n${data.pesan}`
-                    })
-                }
+                text: `🤖[Bot Transaction] \n\n✅ Reminder baru berhasil dibuat! \n\n 🆔 ID : ${data.data.id}\n📝 Nama : ${data.data.nama}\n⌚ Waktu: ${crontime(data.data.waktu)}`
             })
         },
         onError: async (error) => {

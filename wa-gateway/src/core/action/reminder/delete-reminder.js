@@ -25,13 +25,15 @@ const deleteReminder = async ({
             })
         },
         onSuccess: async () => {
+            console.log('crons before removal', cronService.crons);
+            cronService.removeCron(`reminder-${id}`);
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
                     key: m.key
                 }
             })
-            cronService.removeCron(`reminder-${id}`);
+            console.log('crons after removal', cronService.crons);
         },
         onError: async (error) => {
             await sock.sendMessage(m.key.remoteJid, {

@@ -15,11 +15,7 @@ export class ReminderController {
             const cacheClient = this.cacheService.getClient();
 
             const promptResult = await this.aiAgentService.analyzePromptReminder({ text });
-            await cacheClient.hSet(`reminders:${promptResult.id}`, {
-                id: promptResult.id,
-                nama: promptResult.nama,
-                waktu: promptResult.waktu,
-            });
+            await cacheClient.hSet(`reminders:${promptResult.id}`, promptResult);
             res.status(201).json({
                 error: false,
                 message: 'Reminder created successfully',
@@ -35,21 +31,19 @@ export class ReminderController {
             const { limit } = req.query;
             const results = [];
             const cacheClient = this.cacheService.getClient();
-            console.log('Fetching reminders with limit:', limit, ' type:', typeof limit);
 
             for await (const rawKey of cacheClient.scanIterator({
                 MATCH: 'reminders:*',
                 COUNT: limit || 30
             })) {
-                const key = Array.isArray(rawKey) ? rawKey[0] : rawKey;
-                if (!key || typeof key !== 'string') {
-                    console.log('Invalid key encountered:', key);
+                if (Array.isArray(rawKey) && rawKey.length === 0) {
                     continue;
                 }
-                const reminder = await cacheClient.hGetAll(key);
-                results.push(reminder);
+                for (const key of rawKey) {
+                    const reminder = await cacheClient.hGetAll(key);
+                    results.push(reminder);
+                }
             }
-            console.log(results);
             if (results.length === 0)
                 return res.status(404).json({ error: true, message: 'No reminders found' });
             res.status(200).json({
@@ -67,7 +61,7 @@ export class ReminderController {
         try {
             const { id } = req.params;
             const { text } = req.body;
-            const promptResult = await this.aiAgentService.analyzePromptUpdateReminder({ text });
+            const promptResult = await this.aiAgentService.analyzePromptReminder({ text });
             const cacheClient = this.cacheService.getClient();
             const isHashExist = await cacheClient.exists(`reminders:${id}`);
 
@@ -75,16 +69,12 @@ export class ReminderController {
                 return res.status(404).json({ error: true, message: 'Reminder not found' });
             }
 
-            const result = await cacheClient.hSet(`reminders:${id}`, {
-                id: promptResult.id,
-                nama: promptResult.nama,
-                waktu: promptResult.waktu,
-            });
+            await cacheClient.hSet(`reminders:${id}`, promptResult);
             
             res.status(200).json({
                 error: false,
                 message: 'Reminder updated successfully',
-                data: result
+                data: promptResult
             });
         } catch (error) {
             res.status(500).json({ error: true, message: error.message });

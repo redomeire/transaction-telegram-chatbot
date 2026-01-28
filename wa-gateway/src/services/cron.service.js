@@ -7,7 +7,8 @@ export class CronService {
 
     addCron({ name, time, taskFn }) {
         const newCron = cron.schedule(time, taskFn, {
-            name
+            name,
+            timezone: 'Asia/Jakarta'
         })
         this.crons.set(newCron.name, newCron);
     }

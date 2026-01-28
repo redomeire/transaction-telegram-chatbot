@@ -28,6 +28,15 @@ const updateReminder = async ({
         },
         onSuccess: async (data) => {
             console.log(data);
+            cronService.updateCron({
+                name: `reminder-${data.data.id}`,
+                time: data.data.waktu,
+                taskFn: async () => {
+                    await sock.sendMessage(m.key.remoteJid, {
+                        text: `⏰ [Reminder] \n\n${data.data.pesan}`
+                    })
+                }
+            })
             await sock.sendMessage(m.key.remoteJid, {
                 react: {
                     text: '✅',
@@ -36,15 +45,6 @@ const updateReminder = async ({
             })
             await sock.sendMessage(m.key.remoteJid, {
                 text: `🤖[Bot Transaction] \n\n✅ Reminder berhasil diupdate!`
-            })
-            cronService.updateCron({
-                name: `reminder-${data.id}`,
-                time: data.waktu,
-                taskFn: async () => {
-                    await sock.sendMessage(m.key.remoteJid, {
-                        text: `⏰ [Reminder] \n\n${data.pesan}`
-                    })
-                }
             })
         },
         onError: async (error) => {
