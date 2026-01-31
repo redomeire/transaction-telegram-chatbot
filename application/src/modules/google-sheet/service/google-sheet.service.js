@@ -28,17 +28,26 @@ export class GoogleSheetService {
         return newRow;
     }
 
-    async getLatestRows() {
+    async getLatestRows(params) {
+        const { offset = 0, limit, fromDate, toDate } = { ...params };
         const doc = await this.googleClient.getDoc();
         let sheet = doc.sheetsByTitle[this.getSheetName()];
 
         if (sheet === undefined) {
             throw new Error('Sheet not found for the current month and year');
         }
-        const rows = await sheet.getRows();
+        const rows = await sheet.getRows({ offset, limit });
         
         const latestRows = rows
             .reverse()
+            .filter(row => {
+                if (!fromDate || !toDate) return true;
+                const rowDate = new Date(row.get('Timestamp') ?? '');
+                if (fromDate && toDate) {
+                    return rowDate >= fromDate && rowDate <= toDate;
+                }
+                return false;
+            })
             .map(row => ({
                 ID: row.get('ID') ?? '',
                 Tanggal: dateformatter(row.get('Timestamp') ?? ''),
