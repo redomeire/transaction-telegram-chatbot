@@ -28,7 +28,7 @@ export class ReminderController {
 
     async getReminders(req, res) {
         try {
-            const { limit } = req.query;
+            const { limit = 10 } = { ...req.query };
             const results = [];
             const cacheClient = this.cacheService.getClient();
 

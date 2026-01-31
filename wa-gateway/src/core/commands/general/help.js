@@ -35,6 +35,9 @@ Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yan
   _Contoh: !recap_
 
 ⏱️ *PENGINGAT*
+• *!reminder-init*
+  Menginisialisasi sistem pengingat.
+
 • *!reminder-create [deskripsi]*
   Membuat pengingat baru.
   _Contoh: !reminder-create Bayar Listrik setiap jam 8 malam_

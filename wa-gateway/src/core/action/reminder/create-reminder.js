@@ -27,7 +27,6 @@ const createReminder = async ({
             })
         },
         onSuccess: async (data) => {
-            console.log(data);
             cronService.addCron({
                 name: `reminder-${data.data.id}`,
                 time: data.data.waktu,
