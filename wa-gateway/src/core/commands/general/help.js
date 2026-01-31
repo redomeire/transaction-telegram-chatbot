@@ -30,6 +30,23 @@ Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yan
   Menghapus transaksi secara permanen.
   _Contoh: !delete 10_
 
+• *!recap*
+  Melihat rekapitulasi transaksi hari ini.
+  _Contoh: !recap_
+
+⏱️ *PENGINGAT*
+• *!reminder-create [deskripsi]*
+  Membuat pengingat baru.
+  _Contoh: !reminder-create Bayar Listrik setiap jam 8 malam_
+
+• *!reminder-get [jumlah]*
+  Melihat pengingat yang ada.
+  _Contoh: !reminder-get 3_
+
+• *!reminder-delete [id]*
+  Menghapus pengingat (ID didapat dari !reminder-get).
+  _Contoh: !reminder-delete 2_
+
 ━━━━━━━━━━━━━━
 💡 *Tips:* Gunakan ID yang tertera pada pesan sukses atau hasil *!get* untuk melakukan update/delete.
 `.trim();
