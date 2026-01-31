@@ -10,6 +10,7 @@ export class GoogleSheetController {
         this.updateRow = this.updateRow.bind(this);
         this.getLatestRows = this.getLatestRows.bind(this);
         this.deleteRow = this.deleteRow.bind(this);
+        this.getTodayTransactions = this.getTodayTransactions.bind(this);
     }
 
     async createNewRow(req, res) {
@@ -81,6 +82,37 @@ export class GoogleSheetController {
                 error: false,
                 message: 'Row deleted successfully',
                 data: result
+            });
+        } catch (error) {
+            res.status(500).json({ error: true, message: error.message });
+        }
+    }
+
+    async getTodayTransactions(_, res) {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+
+            const results = await this.cacheService.handleArrayOfObjects(
+                `today-transactions-${this.googleSheetService.getSheetName()}`,
+                this.googleSheetService.getLatestRows.bind(this.googleSheetService, {
+                    fromDate: today,
+                    toDate: tomorrow,
+                })
+            )
+            if (results.length === 0) {
+                return res.status(404).json({
+                    error: true,
+                    message: 'No transactions found for today',
+                });
+            }
+            res.status(200).json({
+                error: false,
+                message: 'Today transactions fetched successfully',
+                data: results
             });
         } catch (error) {
             res.status(500).json({ error: true, message: error.message });

@@ -56,7 +56,7 @@ export default async function onConnectionUpdate(update, sock) {
         if (!shouldReconnect)
             await clearAuthFiles();
         else
-            await connectionInstance.connect();
+            process.exit(1);
     } else if (connection === 'open') {
         console.log('opened connection')
     }
