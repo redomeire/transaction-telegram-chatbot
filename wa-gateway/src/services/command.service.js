@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { dirname } from '../utils/path.js';
 
-class CommandService {
+export class CommandService {
     constructor() {
         this.commands = new Map();
     }
@@ -32,5 +32,3 @@ class CommandService {
         return this.commands.has(commandName)
     }
 }
-
-export const commandService = new CommandService();

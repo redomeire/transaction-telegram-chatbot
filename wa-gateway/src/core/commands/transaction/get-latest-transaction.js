@@ -4,6 +4,7 @@ class GetLatestTransactionCommand {
     constructor() {
         this.name = 'get';
         this.description = 'Get the latest transactions';
+        this.points = 1;
     }
 
     async execute(sock, m, args) {

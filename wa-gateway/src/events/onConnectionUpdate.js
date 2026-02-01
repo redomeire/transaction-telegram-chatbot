@@ -1,5 +1,4 @@
 import { authpath } from '../utils/path.js';
-import { connectionInstance } from '../core/connection.js';
 import { mailService } from '../services/mail.service.js';
 import { DisconnectReason } from "@whiskeysockets/baileys";
 import fs from 'fs';
@@ -9,7 +8,7 @@ import qrcode from 'qrcode';
 const TIMESTAMP_FILE = path.join(process.cwd(), 'auth_info', 'last_qr_sent.txt');
 const EMAIL_COOLDOWN = 1000 * 60 * 5
 
-export default async function onConnectionUpdate(update, sock) {
+export async function onConnectionUpdate(update, sock) {
     const { connection, lastDisconnect, qr } = update;
     if (qr) {
         const now = Date.now();
