@@ -9,11 +9,13 @@ import { onMessageUpsert } from './events/onMessageUpsert.js';
 
 dotenv.config();
 
-const rateLimiter = RateLimiterService.factory('redis', {
-    points: 10,
-    duration: 60,
-    blockDuration: 60
-})
+const rateLimiter = RateLimiterService.factory(
+    process.env.RATE_LIMIT_STORAGE,
+    {
+        points: process.env.RATE_LIMIT_POINTS,
+        duration: process.env.RATE_LIMIT_DURATION,
+        blockDuration: process.env.RATE_LIMIT_BLOCK_DURATION
+    })
 const commandService = new CommandService();
 const messageService = new MessageService(commandService, rateLimiter);
 
