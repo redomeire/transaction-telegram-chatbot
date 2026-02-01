@@ -4,6 +4,7 @@ class CreateTransactionCommand {
     constructor() {
         this.name = 'create';
         this.description = 'Create a new transaction';
+        this.points = 2;
     }
 
     async execute(sock, m, ...args) {

@@ -4,6 +4,7 @@ class UpdateTransactionCommand {
     constructor() {
         this.name = 'update';
         this.description = 'Update transaction';
+        this.points = 2;
     }
 
     async execute(sock, m, ...args) {
