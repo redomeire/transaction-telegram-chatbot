@@ -1,14 +1,12 @@
 import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
 import pino from 'pino';
-import onConnectionUpdate from "../events/onConnectionUpdate.js";
-import onMessageUpsert from "../events/onMessageUpsert.js";
 
 export class Connection {
     constructor() {
         this.sock = null;
     }
 
-    async connect() {
+    async connect({ onConnectionUpdate, onMessageUpsert }) {
         const { state, saveCreds } = await useMultiFileAuthState('auth_info');
         this.sock = makeWASocket({
             logger: pino({ level: 'silent' }),
