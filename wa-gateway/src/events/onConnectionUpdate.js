@@ -8,7 +8,7 @@ import qrcode from 'qrcode';
 const TIMESTAMP_FILE = path.join(process.cwd(), 'auth_info', 'last_qr_sent.txt');
 const EMAIL_COOLDOWN = 1000 * 60 * 5
 
-export async function onConnectionUpdate(update, sock) {
+export async function onConnectionUpdate(update, sock, emitter) {
     const { connection, lastDisconnect, qr } = update;
     if (qr) {
         const now = Date.now();
@@ -58,6 +58,8 @@ export async function onConnectionUpdate(update, sock) {
             process.exit(1);
     } else if (connection === 'open') {
         console.log('opened connection')
+        if (!sock.user) return;
+        emitter.emit('ready', sock);
     }
 }
 

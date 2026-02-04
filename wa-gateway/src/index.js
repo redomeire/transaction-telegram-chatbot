@@ -26,6 +26,12 @@ async function start() {
         onConnectionUpdate,
         onMessageUpsert: messageHandler
     });
+    connectionInstance.once('ready', async (sock) => {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        if (!sock.user.id) return;
+        await commandService.runStartupCommands(sock);
+    })
 }
 
 await start();

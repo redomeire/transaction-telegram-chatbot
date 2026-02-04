@@ -1,8 +1,10 @@
 import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
 import pino from 'pino';
+import { EventEmitter } from 'events';
 
-export class Connection {
+export class Connection extends EventEmitter {
     constructor() {
+        super();
         this.sock = null;
     }
 
@@ -17,7 +19,9 @@ export class Connection {
             keepAliveIntervalMs: 10000
         });
 
-        this.sock.ev.on('connection.update', (update) => onConnectionUpdate(update, this.sock));
+        this.sock.ev.on('connection.update', (update) => onConnectionUpdate(
+            update, this.sock, this
+        ));
         this.sock.ev.on('messages.upsert', (event) => onMessageUpsert(this.sock, event));
         this.sock.ev.on('creds.update', saveCreds);
     }

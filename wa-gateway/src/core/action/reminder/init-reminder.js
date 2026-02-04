@@ -15,24 +15,13 @@ const initReminder = async ({
                 'Content-Type': 'application/json',
             },
         },
-        onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
-        },
         onSuccess: async (data) => {
             try {
                 await sock.sendMessage(m.key.remoteJid, {
-                    react: {
-                        text: '✅',
-                        key: m.key
-                    }
+                    text: `🤖[Bot Transaction] \n\nBerhasil menginisialisasi reminder dari database. \n\nTotal reminders: ${data.data.length}`
                 })
                 const crons = data.data;
-                crons.forEach(cron => {
+                for (const cron of crons) {
                     cronService.addCron({
                         name: `reminder-${cron.id}`,
                         time: cron.waktu,
@@ -42,7 +31,7 @@ const initReminder = async ({
                             })
                         }
                     })
-                });
+                };
             } catch (error) {
                 console.error('Error initializing reminders:', error);
                 await sock.sendMessage(m.key.remoteJid, {
@@ -52,13 +41,7 @@ const initReminder = async ({
         },
         onError: async (error) => {
             await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal memuat. \n\nError: ${error.message || 'Unknown error'}`
+                text: `🤖[Bot Transaction] \n\nGagal memuat reminder. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })
