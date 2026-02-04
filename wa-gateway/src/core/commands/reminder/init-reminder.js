@@ -4,6 +4,7 @@ export default class InitReminderCommand {
     constructor() {
         this.name = 'reminder-init';
         this.description = 'Initializes reminders from the database and sets them up in the cron service.';
+        this.startup = true;
     }
 
     async execute(sock, m, ...args) {

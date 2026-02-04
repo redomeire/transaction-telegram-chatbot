@@ -16,6 +16,6 @@ export const fetcher = async ({ url, options, onSuccess, onError, onLoading }) =
     } catch (error) {
         console.log('Fetch error:', error);
         if (onError) await onError(error);
-        throw error;
+        // throw error;
     }
 }
