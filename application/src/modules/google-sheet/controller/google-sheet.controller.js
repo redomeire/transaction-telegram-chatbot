@@ -10,6 +10,7 @@ export class GoogleSheetController {
         this.updateRow = this.updateRow.bind(this);
         this.getLatestRows = this.getLatestRows.bind(this);
         this.deleteRow = this.deleteRow.bind(this);
+        this.bulkDeleteRows = this.bulkDeleteRows.bind(this);
         this.getTodayTransactions = this.getTodayTransactions.bind(this);
     }
 
@@ -81,6 +82,26 @@ export class GoogleSheetController {
             res.status(200).json({
                 error: false,
                 message: 'Row deleted successfully',
+                data: result
+            });
+        } catch (error) {
+            res.status(500).json({ error: true, message: error.message });
+        }
+    }
+
+    async bulkDeleteRows(req, res) {
+        try {
+            const { ids } = req.body;
+            if (!Array.isArray(ids) || !ids) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'ids must be an array'
+                });
+            }
+            const result = await this.googleSheetService.bulkDeleteRows({ ids });
+            res.status(200).json({
+                error: false,
+                message: 'Rows deleted successfully',
                 data: result
             });
         } catch (error) {

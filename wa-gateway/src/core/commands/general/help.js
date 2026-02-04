@@ -30,6 +30,10 @@ Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yan
   Menghapus transaksi secara permanen.
   _Contoh: !delete 10_
 
+• *!bulk-delete [ids]*
+  Menghapus banyak transaksi dalam 1 perintah.
+  _Contoh: !delete abcde defgh asdasc_
+
 • *!recap*
   Melihat rekapitulasi transaksi hari ini.
   _Contoh: !recap_

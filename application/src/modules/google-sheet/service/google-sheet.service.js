@@ -5,11 +5,19 @@ export class GoogleSheetService {
     constructor() {
         this.googleClient = googleClient;
     }
-    
-    async addNewRow({ id, judul, harga, kategori, keterangan }) {
+
+    async getSheet() {
         const doc = await this.googleClient.getDoc();
         let sheet = doc.sheetsByTitle[this.getSheetName()];
 
+        if (sheet === undefined) {
+            throw new Error('Sheet not found for the current month and year');
+        }
+        return sheet;
+    }
+
+    async addNewRow({ id, judul, harga, kategori, keterangan }) {
+        let sheet = await this.getSheet();
         if (sheet === undefined) {
             sheet = await doc.addSheet({
                 title: this.getSheetName(),
@@ -30,14 +38,9 @@ export class GoogleSheetService {
 
     async getLatestRows(params) {
         const { offset = 0, limit, fromDate, toDate } = { ...params };
-        const doc = await this.googleClient.getDoc();
-        let sheet = doc.sheetsByTitle[this.getSheetName()];
-
-        if (sheet === undefined) {
-            throw new Error('Sheet not found for the current month and year');
-        }
+        const sheet = await this.getSheet();
         const rows = await sheet.getRows({ offset, limit });
-        
+
         const latestRows = rows
             .reverse()
             .filter(row => {
@@ -60,18 +63,13 @@ export class GoogleSheetService {
     }
 
     async updateRow({ id, tanggal, judul, harga, kategori }) {
-        const doc = await this.googleClient.getDoc();
-        let sheet = doc.sheetsByTitle[this.getSheetName()];
-        if (sheet === undefined) {
-            throw new Error('Sheet not found for the current month and year');
-        }
-
+        const sheet = await this.getSheet();
         const rows = await sheet.getRows();
         const rowToUpdate = rows.find(row => row.get('ID') === id);
+
         if (!rowToUpdate) {
             throw new Error('Row not found');
         }
-
         if (judul !== undefined) rowToUpdate.set('Judul', judul);
         if (harga !== undefined) rowToUpdate.set('Harga', harga);
         if (kategori !== undefined) rowToUpdate.set('Kategori', kategori);
@@ -86,14 +84,10 @@ export class GoogleSheetService {
     }
 
     async deleteRow({ id }) {
-        const doc = await this.googleClient.getDoc();
-        let sheet = doc.sheetsByTitle[this.getSheetName()];
-        if (sheet === undefined) {
-            throw new Error('Sheet not found for the current month and year');
-        }
-
+        const sheet = await this.getSheet();
         const rows = await sheet.getRows();
         const rowToDelete = rows.find(row => row.get('ID') === id);
+
         if (!rowToDelete) {
             throw new Error('Row not found');
         }
@@ -102,15 +96,32 @@ export class GoogleSheetService {
         return { ID: id };
     }
 
-    async getRowById({ id }) {
-        const doc = await this.googleClient.getDoc();
-        let sheet = doc.sheetsByTitle[this.getSheetName()];
-        if (sheet === undefined) {
-            throw new Error('Sheet not found for the current month and year');
+    async bulkDeleteRows({ ids }) {
+        const sheet = await this.getSheet();
+        const rows = await sheet.getRows();
+        const rowsToDelete = rows.filter(row => ids.includes(row.get('ID')));
+
+        if (rowsToDelete.length === 0) {
+            throw new Error('No rows found to delete');
         }
 
+        const responseRows = {
+            successRows: [],
+        }
+        for (const row of rowsToDelete) {
+            const id = row.get('ID');
+            await row.delete();
+            responseRows.successRows.push(id);
+        }
+
+        return { deletedIDs: responseRows };
+    }
+
+    async getRowById({ id }) {
+        const sheet = await this.getSheet();
         const rows = await sheet.getRows();
         const row = rows.find(row => row.get('ID') === id);
+
         if (!row) {
             throw new Error('Row not found');
         }
@@ -128,7 +139,6 @@ export class GoogleSheetService {
     getSheetName() {
         const date = new Date();
         const options = { month: 'long', year: 'numeric' };
-
         const sheetName = date.toLocaleString('id-ID', options);
         return sheetName;
     }
