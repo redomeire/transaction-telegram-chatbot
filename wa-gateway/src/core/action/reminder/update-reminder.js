@@ -6,7 +6,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 const updateReminder = async ({
     id,
     text,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -19,12 +19,7 @@ const updateReminder = async ({
             body: JSON.stringify({ text }),
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
             cronService.updateCron({
@@ -36,26 +31,11 @@ const updateReminder = async ({
                     })
                 }
             })
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Reminder berhasil diupdate!`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerhasil mengupdate reminder:\n\n📝 Nama : ${data.data.nama ?? ''}\n⌚ Waktu: ${crontime(data.data.waktu)}\nPesan: ${data.data.pesan}`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mengupdate reminder. \n\nError: ${error.message || 'Unknown error'}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nGagal mengupdate reminder dengan ID ${id}. \n\nError: ${error.message || 'Unknown error'}`
+            )
         }
     })
     return response;

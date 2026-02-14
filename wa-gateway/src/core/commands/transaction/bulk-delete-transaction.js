@@ -2,17 +2,17 @@ import { bulkDeleteTransaction } from "../../action/transaction/bulk-delete-tran
 
 class DeleteTransactionCommand {
     constructor() {
-        this.name = 'bulk-delete';
+        this.name = 'delete_transaction_bulk';
         this.description = 'bulk delete transaction by id';
         this.points = 4;
     }
 
-    async execute(sock, m, args) {
+    async execute(bot, m, args) {
         const ids = args;
-        if (!ids) return sock.sendMessage(m.key.remoteJid, { text: "⚠️ Berikan ID!" });
+        if (!ids) return bot.sendMessage(m.chat.id, "⚠️ Berikan ID!");
         await bulkDeleteTransaction({
             ids,
-            sock,
+            bot,
             m
         })
     }

@@ -4,7 +4,7 @@ import { fetcher } from "../../../utils/api.js";
 const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const initReminder = async ({
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -17,32 +17,22 @@ const initReminder = async ({
         },
         onSuccess: async (data) => {
             try {
-                await sock.sendMessage(m.key.remoteJid, {
-                    text: `🤖[Bot Transaction] \n\nBerhasil menginisialisasi reminder dari database. \n\nTotal reminders: ${data.data.length}`
-                })
                 const crons = data.data;
                 for (const cron of crons) {
                     cronService.addCron({
                         name: `reminder-${cron.id}`,
                         time: cron.waktu,
                         taskFn: async () => {
-                            await sock.sendMessage(m.key.remoteJid, {
-                                text: `⏰ [Reminder] \n\n${cron.pesan}`
-                            })
+                            // TODO: send feedback to user when reminder is executed
                         }
                     })
                 };
             } catch (error) {
                 console.error('Error initializing reminders:', error);
-                await sock.sendMessage(m.key.remoteJid, {
-                    text: `🤖[Bot Transaction] \n\nGagal menginisialisasi reminder. \n\nError: ${error.message || 'Unknown error'}`
-                })
             }
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal memuat reminder. \n\nError: ${error.message || 'Unknown error'}`
-            })
+            // TODO: implement error handling
         }
     })
     return response;

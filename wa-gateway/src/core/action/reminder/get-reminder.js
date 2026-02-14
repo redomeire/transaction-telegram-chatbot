@@ -5,7 +5,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const getReminder = async ({
     limit,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -17,32 +17,14 @@ const getReminder = async ({
             },
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nBerikut ${limit !== -1 ? limit : 'semua'} reminder terbaru anda:\n\n${data.data.map((reminder, index) => `${index + 1}. *${reminder.id ?? 'undefined'}*\n📝 Nama : ${reminder.nama ?? ''}\n⌚ Waktu: ${crontime(reminder.waktu)}\n`).join('\n')}`
-            })
+            const list = data.data.map((reminder, index) => `${index + 1}. *${reminder.id ?? 'undefined'}*\n📝 Nama : ${reminder.nama ?? ''}\n⌚ Waktu: ${crontime(reminder.waktu)}\n`).join('\n');
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerikut adalah daftar reminder yang telah dibuat:\n\n${list || 'Tidak ada reminder yang ditemukan.'}`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
+            await bot.sendMessage(m.chat.id, {
                 text: `🤖[Bot Transaction] \n\nGagal memuat. \n\nError: ${error.message || 'Unknown error'}`
             })
         }

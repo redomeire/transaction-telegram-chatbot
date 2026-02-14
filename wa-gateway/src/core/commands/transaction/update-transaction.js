@@ -2,19 +2,19 @@ import { updateTransaction } from "../../action/transaction/update-transaction.j
 
 class UpdateTransactionCommand {
     constructor() {
-        this.name = 'update';
+        this.name = 'update_transaction';
         this.description = 'Update transaction';
         this.points = 2;
     }
 
-    async execute(sock, m, ...args) {
+    async execute(bot, m, ...args) {
         const firstArrayElement = args[0];
         const id = firstArrayElement[0];
         const restOfWords = args.join(' ').replace(id, '').trim();
         await updateTransaction({
             id,
             text: restOfWords,
-            sock,
+            bot,
             m
         })
     }
