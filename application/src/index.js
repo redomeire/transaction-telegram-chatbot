@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { googleSheetRouter } from './modules/google-sheet/router/index.js';
 import { reminderRouter } from './modules/reminder/router/index.js';
 import { webhookRouter } from './modules/webhook/router/index.js';
+import { botClient } from './modules/bot/client/bot-client.js';
 
 dotenv.config();
 
@@ -20,5 +21,12 @@ if (process.env.NODE_ENV !== 'production') {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 }
+
+botClient.bot.on('message', async (msg) => {
+    console.log('Received message:', msg);
+    await botClient.bot.sendMessage(msg.chat.id,
+        'Hello! I am your assistant bot. How can I help you today?'
+    );
+})
 
 export default app;

@@ -6,6 +6,6 @@ export const CREATE_TRANSACTION_COMMAND = {
         const chatId = message.chat.id;
         const { botService, cacheService } = services;
         await cacheService.getClient().set(`state:${chatId}`, CREATE_TRANSACTION_COMMAND.name, 'EX', 1000);
-        await botService.sendMessage(chatId, 'Please provide your transaction details');
+        await botService.sendMessage({ chatId, message: 'Please provide your transaction details' });
     }
 }

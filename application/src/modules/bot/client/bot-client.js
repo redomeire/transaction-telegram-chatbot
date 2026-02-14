@@ -5,7 +5,7 @@ const { TELEGRAM_BOT_TOKEN } = process.env;
 class BotClient {
     constructor() {
         this.bot = new TelegramBot(TELEGRAM_BOT_TOKEN,
-            { polling: false }
+            { polling: true }
         );
     }
 }

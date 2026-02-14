@@ -4,23 +4,27 @@ import { services } from "../../../core/services/index.js";
 export class WebhookController {
     async handle(req, res) {
         try {
-            const { update } = req.body;
-            if (!update) {
+            console.log('Received webhook update:', JSON.stringify(req.body));
+            const { message } = req.body;
+            if (!message) {
                 return res.status(400).json({
-                    error: true, message: 'update is required'
+                    error: true, message: 'message is required'
                 });
             }
 
-            if (update.message?.text?.startsWith('/')) {
-                const commandName = update.message.text.split(' ')[0].replace('/', '');
+            if (message?.text?.startsWith('/')) {
+                console.log(`Received command: ${message.text} from chat ${message.chat.id}`);
+                const commandName = message.text.split(' ')[0].replace('/', '');
                 const command = registry.commands.get(commandName)?.command;
                 if (command) {
-                    command.execute(services)(update.message);
+                    command.execute(services)(message);
+                } else {
+                    console.log(`No command found for ${commandName}, ignoring message`);
                 }
             }
 
-            if (update.message?.text && !update.message.text.startsWith('/')) {
-                const chatId = update.message.chat.id;
+            if (message?.text && !message.text.startsWith('/')) {
+                const chatId = message.chat.id;
                 const cacheClient = services.cacheService.getClient()
 
                 // userstate saves the action name
@@ -28,19 +32,23 @@ export class WebhookController {
 
                 if (userState) {
                     const action = registry.commands.get(userState)?.action;
-                    await action.execute(services)(update.message);
+                    await action.execute(services)(message);
                     await cacheClient.del(`state:${chatId}`);
+                    console.log(`Executed action ${userState} for chat ${chatId} and cleared state`)
+                } else {
+                    console.log(`No user state found for chat ${chatId}, ignoring message`)
                 }
+                console.log(`Received message from chat ${chatId} with text: ${message.text} and user state: ${userState || 'none'} `)
             }
 
-            if (update.callback_query) {
-                const callbackData = update.callback_query.data;
+            if (callback_query) {
+                const callbackData = callback_query.data;
                 const action = registry.commands.get(callbackData)?.action;
                 if (action) {
-                    await action.execute(services)(update.callback_query);
+                    await action.execute(services)(callback_query);
                 }
                 await services.botService.client.answerCallbackQuery({
-                    callback_query_id: update.callback_query.id,
+                    callback_query_id: callback_query.id,
                 })
             }
 
