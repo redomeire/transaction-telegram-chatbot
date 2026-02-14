@@ -1,7 +1,8 @@
 export const HELP_COMMAND = {
   name: 'help',
   description: 'Displays help information about available commands.',
-  execute: (services) => async (bot, msg) => {
+  execute: (services) => async (msg) => {
+    const { botService } = services;
     const chatId = msg.chat.id;
     const message = `
   🤖 *WA-GATEWAY ASSISTANT* 🤖
@@ -55,6 +56,6 @@ Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yan
 ━━━━━━━━━━━━━━
 💡 *Tips:* Gunakan ID yang tertera pada pesan sukses atau hasil *!get* untuk melakukan update/delete.
 `.trim();
-    await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+    await botService.sendMessage(chatId, message, { parse_mode: 'Markdown' });
   }
 }
