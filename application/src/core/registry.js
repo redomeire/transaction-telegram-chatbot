@@ -1,16 +1,16 @@
-import { BULK_DELETE_TRANSACTION_ACTION } from "./action/transaction/bulk-delete-transaction";
-import { CREATE_TRANSACTION_ACTION } from "./action/transaction/create-transaction";
-import { DELETE_TRANSACTION_ACTION } from "./action/transaction/delete-transaction";
-import { GET_LATEST_TRANSACTION_ACTION } from "./action/transaction/get-latest-transaction";
-import { RECAP_TRANSACTION_ACTION } from "./action/transaction/recap-transaction";
-import { UPDATE_TRANSACTION_ACTION } from "./action/transaction/update-transaction";
-import { HELP_COMMAND } from "./commands/general/help";
-import { BULK_DELETE_TRANSACTION_COMMAND } from "./commands/transaction/bulk-delete-transaction";
-import { CREATE_TRANSACTION_COMMAND } from "./commands/transaction/create-transaction";
-import { DELETE_TRANSACTION_COMMAND } from "./commands/transaction/delete-transaction";
-import { GET_LATEST_TRANSACTION_COMMAND } from "./commands/transaction/get-latest-transaction";
-import { RECAP_TRANSACTION_COMMAND } from "./commands/transaction/recap-transaction";
-import { UPDATE_TRANSACTION_COMMAND } from "./commands/transaction/update-transaction";
+import { BULK_DELETE_TRANSACTION_ACTION } from "./action/transaction/bulk-delete-transaction.js";
+import { CREATE_TRANSACTION_ACTION } from "./action/transaction/create-transaction.js";
+import { DELETE_TRANSACTION_ACTION } from "./action/transaction/delete-transaction.js";
+import { GET_LATEST_TRANSACTION_ACTION } from "./action/transaction/get-latest-transaction.js";
+import { RECAP_TRANSACTION_ACTION } from "./action/transaction/recap-transaction.js";
+import { UPDATE_TRANSACTION_ACTION } from "./action/transaction/update-transaction.js";
+import { HELP_COMMAND } from "./commands/general/help.js";
+import { BULK_DELETE_TRANSACTION_COMMAND } from "./commands/transaction/bulk-delete-transaction.js";
+import { CREATE_TRANSACTION_COMMAND } from "./commands/transaction/create-transaction.js";
+import { DELETE_TRANSACTION_COMMAND } from "./commands/transaction/delete-transaction.js";
+import { GET_LATEST_TRANSACTION_COMMAND } from "./commands/transaction/get-latest-transaction.js";
+import { RECAP_TRANSACTION_COMMAND } from "./commands/transaction/recap-transaction.js";
+import { UPDATE_TRANSACTION_COMMAND } from "./commands/transaction/update-transaction.js";
 
 const commands = [
     {
