@@ -1,4 +1,4 @@
-export default class HelpCommand {
+export default class StartCommand {
     constructor() {
         this.name = 'start';
         this.description = 'Displays help information about available commands.';

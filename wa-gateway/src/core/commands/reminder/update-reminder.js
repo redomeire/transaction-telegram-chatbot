@@ -1,3 +1,4 @@
+import { stateService } from "../../../services/state.service.js";
 import { updateReminder } from "../../action/reminder/update-reminder.js";
 
 class UpdateReminderCommand {
@@ -7,15 +8,30 @@ class UpdateReminderCommand {
     }
 
     async execute(bot, m, ...args) {
-        const firstArrayElement = args[0];
-        const id = firstArrayElement[0];
-        const restOfWords = args.join(' ').replace(id, '').trim();
+        stateService.setState(m.chat.id, {
+            cmd: this.name,
+            step: 'WAIT_REMINDER_UPDATE_DETAILS'
+        });
+        await bot.sendMessage(m.chat.id, "😊 Kasih tau aku ID remindernya, terus apa yang mau kamu ubah?", {
+            parse_mode: 'Markdown',
+            reply_markup: {
+                force_reply: true,
+                selective: true
+            }
+        });
+    }
+
+    async onReply(bot, m) {
+        const chatId = m.chat.id;
+        const id = m.text.split(' ')[0];
+        const text = m.text.split(' ').slice(1).join(' ');
         await updateReminder({
             id,
-            text: restOfWords,
+            text,
             bot,
             m
-        })
+        });
+        stateService.clearState(chatId);
     }
 }
 
