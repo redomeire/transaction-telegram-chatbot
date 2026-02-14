@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { dirname } from '../utils/path.js';
-import { jidNormalizedUser } from '@whiskeysockets/baileys';
 
 export class CommandService {
     constructor() {
@@ -25,22 +24,19 @@ export class CommandService {
         console.log(`Loaded ${this.commands.size} commands.`);
     }
 
-    async runStartupCommands(sock) {
+    async runStartupCommands(bot) {
         const startupCommands = Array.from(
             this.commands.values()).filter(cmd => cmd.startup
         );
-        // TODO: this is considered bad practice, refactor later
         const m = {
-            key: {
-                remoteJid: jidNormalizedUser(sock.user.id),
-                fromMe: true,
-                id: 'SYSTEM_STARTUP'
+            chat: {
+                id: process.env.ADMIN_CHAT_ID
             },
             isSystem: true
         }
         for (const command of startupCommands) {
             try {
-                await command.execute(sock, m);
+                await command.execute(bot, m);
             } catch (error) {
                 console.error(`Error executing startup command ${command.name}:`, error);
             }

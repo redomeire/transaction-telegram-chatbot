@@ -2,16 +2,16 @@ import { createTransaction } from "../../action/transaction/create-transaction.j
 
 class CreateTransactionCommand {
     constructor() {
-        this.name = 'create';
+        this.name = 'create_transaction';
         this.description = 'Create a new transaction';
         this.points = 2;
     }
 
-    async execute(sock, m, ...args) {
+    async execute(bot, m, ...args) {
         const restOfWords = args.join(' ');
         await createTransaction({
             text: restOfWords,
-            sock,
+            bot,
             m
         })
     }

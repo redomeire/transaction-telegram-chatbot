@@ -2,16 +2,16 @@ import { getLatestTransaction } from "../../action/transaction/get-latest-transa
 
 class GetLatestTransactionCommand {
     constructor() {
-        this.name = 'get';
+        this.name = 'get_latest_transaction';
         this.description = 'Get the latest transactions';
         this.points = 1;
     }
 
-    async execute(sock, m, args) {
+    async execute(bot, m, args) {
         const limit = parseInt(args[0]) || 5;
         await getLatestTransaction({
             limit,
-            sock,
+            bot,
             m
         })
     }

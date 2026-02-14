@@ -6,32 +6,29 @@ export class MessageService {
         this.rateLimiter = rateLimiter;
     }
 
-    async handleIncomingMessage(sock, event) {
-        for (const m of event.messages) {
-            const msgContent = m.message?.conversation || m.message?.extendedTextMessage?.text;
-            if (!msgContent || !msgContent.startsWith('!')) continue;
-            const { commandName, args } = this.trimMessage(msgContent);
+    async handleIncomingMessage(bot, msg) {
+        const chatId = msg.chat.id;
+        const text = msg.text;
 
-            const command = this.commandService.getCommand(commandName);
+        if (!text || !text.startsWith('/')) return;
 
-            if (command) {
-                try {
-                    await this.rateLimiter.consume(m.key.remoteJid, command.points)
-                    await command.execute(sock, m, args);
-                } catch (error) {
-                    console.error(`Error executing command "${commandName}":`, error);
-                    if (error instanceof RateLimiterRes) {
-                        const seconds = Math.ceil(error.msBeforeNext / 1000);
-                        await sock.sendMessage(m.key.remoteJid, {
-                            text: `⏳ [Bot Assistant]: Batas penggunaan perintah telah tercapai. Silakan tunggu sekitar ${seconds} detik sebelum mencoba lagi.`
-                        }, { quoted: m });
-                    }
+        const { commandName, args } = this.trimMessage(text);
+        const command = this.commandService.getCommand(commandName);
+
+        if (command) {
+            try {
+                await this.rateLimiter.consume(chatId, command.points || 1);
+                await command.execute(bot, msg, args);
+            } catch (error) {
+                if (error instanceof RateLimiterRes) {
+                    const seconds = Math.ceil(error.msBeforeNext / 1000);
+                    await bot.sendMessage(chatId, `⏳ Limit reached. Please wait ${seconds} seconds before trying again.`);
+                } else {
+                    console.error(`Error executing ${commandName}:`, error);
                 }
-            } else {
-                await sock.sendMessage(m.key.remoteJid, {
-                    text: `🤖 [Bot Assistant]: Maaf, perintah "${commandName}" tidak dikenali. Ketik !help untuk daftar perintah yang tersedia.`
-                }, { quoted: m });
             }
+        } else {
+            await bot.sendMessage(chatId, `❓ Unknown command: ${commandName}`);
         }
     }
 

@@ -4,7 +4,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const deleteTransaction = async ({
     id,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -16,31 +16,13 @@ const deleteTransaction = async ({
             }
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerhasil menghapus transaksi dengan ID ${id}.`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal menghapus transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nGagal menghapus transaksi dengan ID ${id}. \n\nError: ${error.message || 'Unknown error'}`)
         }
     })
     return response;

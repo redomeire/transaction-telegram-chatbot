@@ -22,16 +22,15 @@ const messageService = new MessageService(commandService, rateLimiter);
 async function start() {
     await commandService.init();
     const messageHandler = await onMessageUpsert(messageService);
-    await connectionInstance.connect({
+    await connectionInstance.connect('telegram', {
+        token: process.env.TELEGRAM_BOT_TOKEN
+    }, {
         onConnectionUpdate,
         onMessageUpsert: messageHandler
     });
-    connectionInstance.once('ready', async (sock) => {
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
-        if (!sock.user.id) return;
-        await commandService.runStartupCommands(sock);
-    })
+    await commandService.runStartupCommands(
+        connectionInstance.driver.client
+    );
 }
 
 await start();

@@ -6,7 +6,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const createReminder = async ({
     text,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -19,41 +19,20 @@ const createReminder = async ({
             body: JSON.stringify({ text }),
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
             cronService.addCron({
                 name: `reminder-${data.data.id}`,
                 time: data.data.waktu,
                 taskFn: async () => {
-                    await sock.sendMessage(m.key.remoteJid, {
-                        text: `⏰ [Reminder] \n\n${data.data.pesan}`
-                    })
+                    await bot.sendMessage(m.chat.id, `⏰ [Reminder] \n\n${data.data.pesan}`)
                 }
             })
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\n✅ Reminder baru berhasil dibuat! \n\n 🆔 ID : ${data.data.id}\n📝 Nama : ${data.data.nama}\n⌚ Waktu: ${crontime(data.data.waktu)}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerhasil membuat reminder:\n\n📝 Nama : ${data.data.nama ?? ''}\n⌚ Waktu: ${crontime(data.data.waktu)}\nPesan: ${data.data.pesan}`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
+            await bot.sendMessage(m.chat.id, {
                 text: `🤖[Bot Transaction] \n\nGagal membuat reminder. \n\nError: ${error.message || 'Unknown error'}`
             })
         }

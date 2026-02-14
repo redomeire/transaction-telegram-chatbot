@@ -4,7 +4,7 @@ import { rupiahFormatter } from "../../../utils/rupiahformatter.js";
 const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const recapTransaction = async ({
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -16,35 +16,13 @@ const recapTransaction = async ({
             },
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
-            console.log(data);
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nBerikut rekap transaksi anda di hari ini:\n\n${data.data.map((tx, index) => `${index + 1}. *${tx.ID ?? 'undefined'}*\n📅 Tanggal : ${tx.Tanggal ?? ''}\n💰 Nominal: ${rupiahFormatter(tx.Harga)}\n📝 Judul: ${tx.Judul}\n`).join('\n')}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nRekap transaksi:\n\n${data.data.map((item, index) => `${index + 1}. 🆔 ID: ${item.ID}\n📝 Nama: ${item.Judul}\n💰 Jumlah: ${rupiahFormatter(item.Harga)}\n📅 Tanggal: ${item.Tanggal}\n`).join('\n\n')}`);
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mendapatkan transaksi. \n\nError: ${error.message || 'Unknown error'}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nGagal mengambil rekap transaksi. \n\nError: ${error.message || 'Unknown error'}`)
         }
     })
     return response;

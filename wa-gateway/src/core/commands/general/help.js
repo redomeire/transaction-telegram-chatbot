@@ -1,12 +1,13 @@
 export default class HelpCommand {
     constructor() {
-        this.name = 'help';
+        this.name = 'start';
         this.description = 'Displays help information about available commands.';
     }
 
-    async execute(sock, m, ...args) {
+  async execute(bot, m) {
+    const chatId = m.chat.id;
         const message = `
-  🤖 *WA-GATEWAY ASSISTANT* 🤖
+  🤖 *TRANSACTION ASSISTANT* 🤖
 
 Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yang tersedia:
 
@@ -57,6 +58,6 @@ Halo! Saya siap membantu mencatat keuanganmu. Berikut adalah daftar perintah yan
 ━━━━━━━━━━━━━━
 💡 *Tips:* Gunakan ID yang tertera pada pesan sukses atau hasil *!get* untuk melakukan update/delete.
 `.trim();
-        await sock.sendMessage(m.key.remoteJid, { text: message }, { quoted: m });
+        await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
     }
 }
