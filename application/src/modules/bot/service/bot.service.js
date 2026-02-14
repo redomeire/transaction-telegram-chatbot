@@ -1,5 +1,4 @@
-import { botClient } from "../client/bot-client";
-
+import { botClient } from "../client/bot-client.js";
 class BotService {
     constructor() {
         this.client = botClient.bot;

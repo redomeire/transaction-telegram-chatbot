@@ -1,7 +1,7 @@
-import { registry } from "../../../core/registry";
-import { services } from "../../../core/services";
+import { registry } from "../../../core/registry.js";
+import { services } from "../../../core/services/index.js";
 
-class WebhookController {
+export class WebhookController {
     async handle(req, res) {
         try {
             const { update } = req.body;
