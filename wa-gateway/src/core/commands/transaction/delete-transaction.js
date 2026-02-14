@@ -2,16 +2,16 @@ import { deleteTransaction } from "../../action/transaction/delete-transaction.j
 
 class DeleteTransactionCommand {
     constructor() {
-        this.name = 'delete';
+        this.name = 'delete_transaction';
         this.description = 'delete transaction by id';
     }
 
-    async execute(sock, m, args) {
+    async execute(bot, m, args) {
         const id = args[0];
-        if (!id) return sock.sendMessage(m.key.remoteJid, { text: "⚠️ Berikan ID!" });
+        if (!id) return bot.sendMessage(m.chat.id, "⚠️ Berikan ID!");
         await deleteTransaction({
             id,
-            sock,
+            bot,
             m
         })
     }

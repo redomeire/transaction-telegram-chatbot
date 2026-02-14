@@ -6,7 +6,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 const updateTransaction = async ({
     id,
     text,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -19,34 +19,14 @@ const updateTransaction = async ({
             body: JSON.stringify({ text })
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction]\n*Transaksi Berhasil Diupdate!*\n\n🆔 ID: *${data.data.ID}*\n📅 Tanggal: ${data.data.Tanggal}\n💰 Nominal: ${rupiahFormatter(data.data.Harga)}\n📝 Judul: ${data.data.Judul}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerhasil mengupdate transaksi dengan ID ${id}:\n\n📝 Nama : ${data.data.Judul ?? ''}\n💰 Jumlah: ${rupiahFormatter(data.data.Harga)}\n📅 Tanggal: ${data.data.Tanggal}\n`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal mengupdate transaksi dengan ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nGagal mengupdate transaksi dengan ID ${id}. \n\nError: ${error.message || 'Unknown error'}`
+            )
         }
     })
     return response;

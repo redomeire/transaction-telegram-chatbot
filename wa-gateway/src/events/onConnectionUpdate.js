@@ -8,58 +8,51 @@ import qrcode from 'qrcode';
 const TIMESTAMP_FILE = path.join(process.cwd(), 'auth_info', 'last_qr_sent.txt');
 const EMAIL_COOLDOWN = 1000 * 60 * 5
 
-export async function onConnectionUpdate(update, sock, emitter) {
+export async function onConnectionUpdate(update, client, connectionInstance) {
     const { connection, lastDisconnect, qr } = update;
-    if (qr) {
+    const isWhatsApp = connectionInstance.driver.constructor.name === 'WhatsAppDriver';
+
+    if (qr && isWhatsApp) {
         const now = Date.now();
         let lastSent = 0;
-
         try {
             if (fs.existsSync(TIMESTAMP_FILE)) {
                 lastSent = parseInt(fs.readFileSync(TIMESTAMP_FILE, 'utf-8'));
             }
-        } catch (error) {
-            console.error('Error reading timestamp file:', error);
+        } catch (e) {
+            console.error(e);
         }
 
-        const timeDiff = now - lastSent;
+        if ((now - lastSent) >= EMAIL_COOLDOWN) {
+            try {
+                const code = await generatePairingCode(client);
+                const bufferCode = await generateQRCode(qr);
 
-        if (timeDiff < EMAIL_COOLDOWN) {
-            const minutesLeft = Math.ceil((EMAIL_COOLDOWN - timeDiff) / 60000);
-            console.log(`⏳ Email skipped. Cooldown active (${minutesLeft} minutes remaining).`);
-            return;
-        }
-
-        try {
-            const code = await generatePairingCode(sock);
-            const bufferCode = await generateQRCode(qr);
-
-            if (!bufferCode || !code) return;
-
-            await mailService.sendAuthenticationMail({
-                to: "redomeire@gmail.com",
-                subject: "Login attempt detected",
-                body: `<p>Scan the attached QR code to log in to the WhatsApp Gateway.</p><img src="cid:qrcode@cid" style="width: 300px; height: 300px;"/> <p>Or use this pairing code: <br><strong><span style="font-size: 28px;letter-spacing: 0.25rem">${code}</strong></span></p>`,
-                qrBuffer: bufferCode
-            });
-            fs.writeFileSync(TIMESTAMP_FILE, now.toString(), 'utf-8');
-            console.log('📧 Sending authentication email with QR code and pairing code...');
-        } catch (error) {
-            console.error('❌ Failed to send authentication email:', error);
+                await mailService.sendAuthenticationMail({
+                    to: "redomeire@gmail.com",
+                    subject: `[${connectionInstance.type}] Login attempt`,
+                    body: `<p>Scan QR atau gunakan code: <b>${code}</b></p>`,
+                    qrBuffer: bufferCode
+                });
+                fs.writeFileSync(TIMESTAMP_FILE, now.toString(), 'utf-8');
+            } catch (error) {
+                console.error('❌ Mail error:', error);
+            }
         }
     }
     if (connection === 'close') {
-        const shouldReconnect =
-            (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut
-        console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect)
-        if (!shouldReconnect)
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const loggedOut = isWhatsApp && statusCode === DisconnectReason.loggedOut;
+
+        if (loggedOut) {
             await clearAuthFiles();
-        else
-            process.exit(1);
+        } else {
+            console.log('🔄 Reconnecting...');
+            if (isWhatsApp) process.exit(1);
+        }
     } else if (connection === 'open') {
-        console.log('opened connection')
-        if (!sock.user) return;
-        emitter.emit('ready', sock);
+        console.log(`✅ [${connectionInstance.type}] Connection Opened`);
+        connectionInstance.emit('ready', client);
     }
 }
 

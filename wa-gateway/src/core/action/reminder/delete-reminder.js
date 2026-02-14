@@ -5,7 +5,7 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const deleteReminder = async ({
     id,
-    sock,
+    bot,
     m
 }) => {
     const response = await fetcher({
@@ -17,31 +17,15 @@ const deleteReminder = async ({
             }
         },
         onLoading: async () => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '⏳',
-                    key: m.key
-                }
-            })
+            await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async () => {
             cronService.removeCron(`reminder-${id}`);
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '✅',
-                    key: m.key
-                }
-            })
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nBerhasil menghapus reminder dengan ID ${id}.`)
         },
         onError: async (error) => {
-            await sock.sendMessage(m.key.remoteJid, {
-                react: {
-                    text: '❌',
-                    key: m.key
-                }
-            })
-            await sock.sendMessage(m.key.remoteJid, {
-                text: `🤖[Bot Transaction] \n\nGagal menghapus reminder ID ${id}.\n\nError: ${error.message || 'Unknown error'}`
+            await bot.sendMessage(m.chat.id, {
+                text: `🤖[Bot Transaction] \n\nGagal menghapus reminder dengan ID ${id}. \n\nError: ${error.message || 'Unknown error'}`
             })
         }
     })

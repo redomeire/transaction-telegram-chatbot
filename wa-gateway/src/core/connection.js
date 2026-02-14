@@ -1,36 +1,51 @@
-import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
 import pino from 'pino';
 import { EventEmitter } from 'events';
+import { WhatsappDriver } from "./drivers/whatsapp.js";
+import { TelegramDriver } from "./drivers/telegram.js";
 
 export class Connection extends EventEmitter {
     constructor() {
         super();
-        this.sock = null;
+        this.driver = null;
+        this.instance = null;
+        this.type = null;
     }
 
-    async connect({ onConnectionUpdate, onMessageUpsert }) {
-        const { state, saveCreds } = await useMultiFileAuthState('auth_info');
-        this.sock = makeWASocket({
-            logger: pino({ level: 'silent' }),
-            auth: state,
-            browser: ['Ubuntu', 'Chrome', '20.0.04'],
-            connectTimeoutMs: 60000,
-            defaultQueryTimeoutMs: 0,
-            keepAliveIntervalMs: 10000
-        });
+    initDriver(type, config) {
+        this.type = type;
+        const drivers = {
+            whatsapp: WhatsappDriver,
+            telegram: TelegramDriver
+        };
 
-        this.sock.ev.on('connection.update', (update) => onConnectionUpdate(
-            update, this.sock, this
-        ));
-        this.sock.ev.on('messages.upsert', (event) => onMessageUpsert(this.sock, event));
-        this.sock.ev.on('creds.update', saveCreds);
+        if (!drivers[type]) throw new Error(`Driver ${type} not supported.`);
+        this.driver = new drivers[type](config);
+    }
+
+    async connect(type, config, { onMessageUpsert, onConnectionUpdate }) {
+        this.initDriver(type, config);
+
+        this.instance = await this.driver.connect({
+            onConnectionUpdate: (update, client) => {
+                onConnectionUpdate(update, client, this);
+            },
+            onMessageUpsert: (event, client) => {
+                onMessageUpsert(client, event);
+            }
+        })
+    }
+
+    async sendMessage(to, text, options) {
+        if (!this.driver) throw new Error('No driver initialized');
+        await this.driver.sendMessage(to, text, options);
     }
 
     async disconnect() {
-        if (this.sock) {
-            await this.sock.logout('User initiated logout');
-            this.sock = null;
+        if (this.instance && this.instance.close) {
+            await this.instance.close();
         }
+        this.driver = null;
+        this.instance = null;
     }
 }
 
