@@ -1,4 +1,5 @@
 import { RateLimiterRes } from "rate-limiter-flexible";
+import { stateService } from "./state.service.js";
 
 export class MessageService {
     constructor(commandService, rateLimiter) {
@@ -9,6 +10,14 @@ export class MessageService {
     async handleIncomingMessage(bot, msg) {
         const chatId = msg.chat.id;
         const text = msg.text;
+
+        const activeState = stateService.getState(chatId);
+        if (activeState) {
+            const command = this.commandService.getCommand(activeState.cmd);
+            if (command && command.onReply) {
+                return await command.onReply(bot, msg);
+            }
+        }
 
         if (!text || !text.startsWith('/')) return;
 
