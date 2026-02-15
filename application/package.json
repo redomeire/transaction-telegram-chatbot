@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r dotenv/config ./src/index.js"
+    "start": "node -r dotenv/config dist/index.js",
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +23,18 @@
     "nanoid": "^5.1.6",
     "openai": "^6.16.0",
     "redis": "^5.10.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.20.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.2.3",
+    "eslint": "9.20.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.5",
+    "prettier": "3.8.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "8.55.0"
   }
 }
