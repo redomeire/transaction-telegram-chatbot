@@ -1,5 +1,6 @@
 import { stateService } from "../../../services/state.service.js";
 import { createUser } from "../../action/user/create-user.js";
+import { getUser } from "../../action/user/get-user.js";
 
 export default class StartCommand {
   constructor() {
@@ -8,12 +9,30 @@ export default class StartCommand {
   }
 
   async execute(bot, m) {
-    stateService.setState(m.chat.id, {
+    const chatId = m.chat.id;
+    const checkUserResult = await getUser({
+      telegramId: m.from.id,
+      bot,
+      m
+    })
+    stateService.setState(chatId, {
       cmd: this.name,
       step: 'WAIT_USERNAME',
-      telegramId: m.from.id
+      telegramId: m.from.id,
+      isUserExist: !!checkUserResult
     })
+  }
+
+  async onReply(bot, m) {
     const chatId = m.chat.id;
+    const username = m.text;
+    const state = stateService.getState(chatId);
+    const telegramId = state.telegramId;
+
+    if (state.isUserExist) {
+      stateService.clearState(chatId);
+      return;
+    }
     const message = `Selamat datang di *TRANSACTION ASSISTANT* 🤖! Saya siap membantu mencatat keuanganmu. Mohon beritahu username anda`;
     await bot.sendMessage(chatId, message, {
       parse_mode: 'Markdown',
@@ -22,13 +41,6 @@ export default class StartCommand {
         selective: true
       }
     });
-  }
-
-  async onReply(bot, m) {
-    const chatId = m.chat.id;
-    const username = m.text;
-    const state = stateService.getState(chatId);
-    const telegramId = state.telegramId;
 
     await createUser({
       bot,
