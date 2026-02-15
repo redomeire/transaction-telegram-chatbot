@@ -26,6 +26,7 @@ class CreateTransactionCommand {
         const chatId = m.chat.id;
         const text = m.text;
         await createTransaction({
+            telegramId: m.from.id,
             text,
             bot,
             m

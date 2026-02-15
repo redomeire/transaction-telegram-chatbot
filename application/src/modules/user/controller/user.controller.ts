@@ -13,15 +13,18 @@ export class UserController {
   async create(req: Request, res: Response) {
     try {
       const { username, telegramId } = req.body;
-      await this.userService.createUser({
+      const user = await this.userService.createUser({
         username,
         telegramId,
       });
-      res
-        .status(201)
-        .json({ error: false, message: "User created successfully" });
+      return res.status(201).json({
+        error: false,
+        message: "User created successfully",
+        data: user,
+      });
     } catch (error: any) {
-      res.status(500).json({ error: true, message: error.message });
+      console.error("Error creating user:", error);
+      return res.status(500).json({ error: true, message: error.message });
     }
   }
   async get(req: Request, res: Response) {

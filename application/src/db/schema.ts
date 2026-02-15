@@ -42,7 +42,7 @@ export const transactionsTable = pgTable("transactions", {
   amount: integer("amount").notNull(),
   notes: varchar("notes", { length: 255 }),
   type: varchar({ enum: ["income", "expense"] }),
-  categoryId: serial("category_id")
+  categoryId: integer("category_id")
     .notNull()
     .references(() => transactionCategoriesTable.id),
   userId: bigint("user_id", { mode: "bigint" })

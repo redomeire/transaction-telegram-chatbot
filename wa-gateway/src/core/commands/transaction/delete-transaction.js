@@ -26,6 +26,7 @@ class DeleteTransactionCommand {
         const id = m.text;
         await deleteTransaction({
             id,
+            telegramId: m.from.id,
             bot,
             m
         })

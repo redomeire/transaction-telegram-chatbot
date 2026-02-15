@@ -26,6 +26,7 @@ class GetLatestTransactionCommand {
         const chatId = m.chat.id;
         const limit = m.text;
         await getLatestTransaction({
+            telegramId: m.from.id,
             limit,
             bot,
             m

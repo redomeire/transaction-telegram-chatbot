@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1771165539709,
-      "tag": "0000_cloudy_nehzno",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1771169078499,
-      "tag": "0001_fuzzy_franklin_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1771169698503,
-      "tag": "0002_hot_rockslide",
+      "when": 1771184472373,
+      "tag": "0000_cheerful_rawhide_kid",
       "breakpoints": true
     }
   ]

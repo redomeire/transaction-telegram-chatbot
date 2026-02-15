@@ -28,6 +28,7 @@ class UpdateTransactionCommand {
         const text = m.text.split(' ').slice(1).join(' ');
         await updateTransaction({
             id,
+            telegramId: m.from.id,
             text,
             bot,
             m

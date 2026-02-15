@@ -5,7 +5,7 @@ import { UserController } from "../controller/user.controller.js";
 const userController = new UserController(userService);
 
 const router = express.Router();
-router.post("/", userController.create);
+router.post("/create", userController.create);
 router.get("/:telegramId", userController.get);
 router.put("/:telegramId", userController.updateUsername);
 

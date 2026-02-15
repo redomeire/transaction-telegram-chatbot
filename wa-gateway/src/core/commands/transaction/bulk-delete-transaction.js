@@ -27,6 +27,7 @@ class DeleteTransactionCommand {
         const ids = m.text.split(',').map(id => id.trim());
         await bulkDeleteTransaction({
             ids,
+            telegramId: m.from.id,
             bot,
             m
         })

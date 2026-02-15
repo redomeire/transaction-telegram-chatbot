@@ -21,6 +21,7 @@ export class UserService {
       name: "Default",
       userId: user[0].telegramId,
     });
+    return user[0];
   }
   async getUserByUsername(username: string) {
     const user = await db

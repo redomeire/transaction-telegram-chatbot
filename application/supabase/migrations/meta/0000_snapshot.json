@@ -1,5 +1,5 @@
 {
-  "id": "6724a71a-e0a0-4ebb-b19c-9a13b8c9718e",
+  "id": "11620e34-6818-4397-b59d-6bf03127eeb9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -55,15 +55,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "reminders_user_id_users_id_fk": {
-          "name": "reminders_user_id_users_id_fk",
+        "reminders_user_id_users_telegram_id_fk": {
+          "name": "reminders_user_id_users_telegram_id_fk",
           "tableFrom": "reminders",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "id"
+            "telegram_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -91,12 +91,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "user_id": {
           "name": "user_id",
           "type": "bigint",
@@ -120,22 +114,31 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "transaction_categories_user_id_users_id_fk": {
-          "name": "transaction_categories_user_id_users_id_fk",
+        "transaction_categories_user_id_users_telegram_id_fk": {
+          "name": "transaction_categories_user_id_users_telegram_id_fk",
           "tableFrom": "transaction_categories",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "id"
+            "telegram_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "name_user_id_unique": {
+          "name": "name_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name",
+            "user_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -168,9 +171,15 @@
           "primaryKey": false,
           "notNull": false
         },
+        "type": {
+          "name": "type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "category_id": {
           "name": "category_id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -210,15 +219,15 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "transactions_user_id_users_id_fk": {
-          "name": "transactions_user_id_users_id_fk",
+        "transactions_user_id_users_telegram_id_fk": {
+          "name": "transactions_user_id_users_telegram_id_fk",
           "tableFrom": "transactions",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "id"
+            "telegram_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -234,16 +243,10 @@
       "name": "users",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
         "telegram_id": {
           "name": "telegram_id",
           "type": "bigint",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true
         },
         "username": {
@@ -277,15 +280,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_telegram_id_unique": {
-          "name": "users_telegram_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "telegram_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

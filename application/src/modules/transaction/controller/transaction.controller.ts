@@ -36,20 +36,22 @@ export class TransactionController {
         ...promptResult,
         userId: telegramId,
       });
-      res.status(201).json({
+      return res.status(201).json({
         error: false,
         message: "Transaction created successfully",
         data: result,
       });
     } catch (error: any) {
-      res.status(500).json({ error: true, message: error.message });
+      return res.status(500).json({ error: true, message: error.message });
     }
   }
   async getLatestTransactions(req: Request, res: Response) {
     try {
       const { telegramId } = req.params as { telegramId: string };
+      const { limit = 10 } = req.query as { limit?: string };
       const transactions = await this.transactionService.getByUserId(
         BigInt(telegramId),
+        Number(limit),
       );
       if (transactions.length === 0) {
         return res.status(404).json({
@@ -113,10 +115,14 @@ export class TransactionController {
         ids: number[];
         telegramId: bigint;
       };
-      await this.transactionService.bulkDelete(telegramId, ids);
+      const deletedIds = await this.transactionService.bulkDelete(
+        telegramId,
+        ids,
+      );
       res.status(200).json({
         error: false,
         message: "Transactions deleted successfully",
+        data: deletedIds.map((item) => item.id.toString()),
       });
     } catch (error: any) {
       res.status(500).json({ error: true, message: error.message });

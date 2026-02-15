@@ -11,10 +11,10 @@ const transactionController = new TransactionController(
 );
 
 const router = express.Router();
-router.post("/", transactionController.create);
+router.post("/create", transactionController.create);
 router.get("/:telegramId", transactionController.getLatestTransactions);
 router.put("/:id", transactionController.updateTransaction);
+router.delete("/bulk-delete", transactionController.bulkDeleteTransactions);
 router.delete("/:id", transactionController.deleteTransaction);
-router.delete("/", transactionController.bulkDeleteTransactions);
 
 export { router as transactionRouter };

@@ -4,16 +4,18 @@ const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const deleteTransaction = async ({
     id,
+    telegramId,
     bot,
     m
 }) => {
     const response = await fetcher({
-        url: `${baseUrl}/google-sheet/delete/${id}`,
+        url: `${baseUrl}/transaction/${id}`,
         options: {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ telegramId })
         },
         onLoading: async () => {
             await bot.sendChatAction(m.chat.id, 'typing');

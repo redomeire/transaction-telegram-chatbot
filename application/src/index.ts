@@ -9,6 +9,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 app.use(express.json());
 app.use("/google-sheet", googleSheetRouter);
 app.use("/reminder", reminderRouter);

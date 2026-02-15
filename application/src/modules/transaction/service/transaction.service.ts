@@ -64,7 +64,7 @@ export class TransactionService {
 
     return categories;
   }
-  async getByUserId(telegramId: bigint) {
+  async getByUserId(telegramId: bigint, limit?: number) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -78,7 +78,8 @@ export class TransactionService {
           between(transactionsTable.createdAt, startOfMonth, endOfMonth),
         ),
       )
-      .orderBy(sql`${transactionsTable.createdAt} desc`);
+      .orderBy(sql`${transactionsTable.createdAt} desc`)
+      .limit(limit || 10);
     return transactions;
   }
   async update(
@@ -96,7 +97,7 @@ export class TransactionService {
         ),
       )
       .returning();
-    return transaction;
+    return transaction[0];
   }
   async delete(telegramId: bigint, id: number) {
     await db
