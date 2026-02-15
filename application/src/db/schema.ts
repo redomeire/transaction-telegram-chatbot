@@ -55,7 +55,7 @@ export const transactionsTable = pgTable("transactions", {
 export const remindersTable = pgTable("reminders", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
-  time: timestamp("remind_at").notNull(),
+  time: varchar("time", { length: 50 }).notNull(),
   message: varchar("description", { length: 255 }),
   userId: bigint("user_id", { mode: "bigint" })
     .notNull()
@@ -69,3 +69,6 @@ export type InsertTransaction = typeof transactionsTable.$inferInsert;
 
 export type SelectUser = typeof usersTable.$inferSelect;
 export type InsertUser = typeof usersTable.$inferInsert;
+
+export type SelectReminder = typeof remindersTable.$inferSelect;
+export type InsertReminder = typeof remindersTable.$inferInsert;

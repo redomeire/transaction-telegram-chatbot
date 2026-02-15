@@ -26,6 +26,7 @@ class UpdateReminderCommand {
         const id = m.text.split(' ')[0];
         const text = m.text.split(' ').slice(1).join(' ');
         await updateReminder({
+            telegramId: m.from.id,
             id,
             text,
             bot,

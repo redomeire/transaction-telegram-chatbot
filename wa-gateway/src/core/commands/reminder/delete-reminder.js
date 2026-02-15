@@ -25,6 +25,7 @@ export default class DeleteReminderCommand {
         const chatId = m.chat.id;
         const id = m.text;
         await deleteReminder({
+            telegramId: m.from.id,
             id,
             bot,
             m

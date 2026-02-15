@@ -26,6 +26,7 @@ export default class CreateReminderCommand {
         const text = m.text;
         await createReminder({
             text,
+            telegramId: m.from.id,
             bot,
             m
         });

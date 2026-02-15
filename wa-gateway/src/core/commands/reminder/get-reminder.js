@@ -25,6 +25,7 @@ export default class GetReminderCommand {
         const chatId = m.chat.id;
         const limit = m.text;
         await getReminder({
+            telegramId: m.from.id,
             limit,
             bot,
             m

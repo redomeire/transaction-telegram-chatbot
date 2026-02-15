@@ -1,14 +1,14 @@
 import { AIAgentService } from "@/modules/ai-agent/service/ai-agent.service";
 import { CacheService } from "@/modules/cache/service/cache.service";
 import { Request, Response } from "express";
+import { ReminderService } from "../service/reminder.service";
 
 export class ReminderController {
-  aiAgentService: AIAgentService;
-  cacheService: CacheService;
-  constructor(aiAgentService: AIAgentService, cacheService: CacheService) {
-    this.aiAgentService = aiAgentService;
-    this.cacheService = cacheService;
-
+  constructor(
+    private aiAgentService: AIAgentService,
+    private cacheService: CacheService,
+    private reminderService: ReminderService,
+  ) {
     this.createReminder = this.createReminder.bind(this);
     this.getReminders = this.getReminders.bind(this);
     this.updateReminder = this.updateReminder.bind(this);
@@ -17,17 +17,38 @@ export class ReminderController {
 
   async createReminder(req: Request, res: Response) {
     try {
-      const { text } = req.body;
+      const { text, telegramId } = req.body;
       const cacheClient = this.cacheService.getClient();
 
       const promptResult = await this.aiAgentService.analyzePromptReminder({
         text,
       });
-      await cacheClient.hSet(`reminders:${promptResult.id}`, promptResult);
+      const result = await this.reminderService.create({
+        ...promptResult,
+        userId: BigInt(telegramId),
+      });
+
+      const rKey = `reminder:${result.id}`;
+      const indexKey = `user:reminders:${telegramId}`;
+
+      await cacheClient
+        .multi()
+        .hSet(rKey, {
+          id: result.id.toString(),
+          userId: result.userId.toString(),
+          title: result.title,
+          time: result.time,
+          message: promptResult.message ?? "",
+        })
+        .expire(rKey, 86400)
+        .sAdd(indexKey, result.id.toString())
+        .expire(indexKey, 86400)
+        .exec();
+
       res.status(201).json({
         error: false,
         message: "Reminder created successfully",
-        data: promptResult,
+        data: result,
       });
     } catch (error: any) {
       res.status(500).json({ error: true, message: error.message });
@@ -36,33 +57,62 @@ export class ReminderController {
 
   async getReminders(req: Request, res: Response) {
     try {
-      const { limit = 10 } = { ...req.query } as { limit?: number };
-      const results = [];
+      const { telegramId } = req.query as { telegramId: string };
       const cacheClient = this.cacheService.getClient();
+      const indexKey = `user:reminders:${telegramId}`;
 
-      for await (const rawKey of cacheClient.scanIterator({
-        MATCH: "reminders:*",
-        COUNT: limit || 30,
-      })) {
-        if (Array.isArray(rawKey) && rawKey.length === 0) {
-          continue;
-        }
-        for (const key of rawKey) {
-          const reminder = await cacheClient.hGetAll(key);
-          results.push(reminder);
+      const reminderIds = await cacheClient.sMembers(indexKey);
+
+      if (reminderIds.length > 0) {
+        const cachedResults = await Promise.all(
+          reminderIds.map((id) => cacheClient.hGetAll(`reminder:${id}`)),
+        );
+
+        const validResults = cachedResults.filter(
+          (r) => Object.keys(r).length > 0,
+        );
+
+        if (validResults.length > 0) {
+          return res.status(200).json({
+            error: false,
+            message: "Reminders fetched successfully",
+            data: validResults,
+          });
         }
       }
-      if (results.length === 0)
+
+      const freshData = await this.reminderService.getByTelegramId(
+        BigInt(telegramId),
+      );
+
+      if (freshData.length === 0) {
         return res
           .status(404)
           .json({ error: true, message: "No reminders found" });
-      res.status(200).json({
+      }
+
+      const pipeline = cacheClient.multi();
+      freshData.forEach((reminder) => {
+        const rKey = `reminder:${reminder.id}`;
+        pipeline.hSet(rKey, {
+          id: reminder.id.toString(),
+          userId: reminder.userId.toString(),
+          title: reminder.title,
+          time: reminder.time,
+          message: reminder.message ?? "",
+        });
+        pipeline.expire(rKey, 86400);
+        pipeline.sAdd(indexKey, reminder.id.toString());
+      });
+      pipeline.expire(indexKey, 86400);
+      await pipeline.exec();
+
+      return res.status(200).json({
         error: false,
         message: "Reminders fetched successfully",
-        data: results,
+        data: freshData,
       });
     } catch (error: any) {
-      console.error(error);
       res.status(500).json({ error: true, message: error.message });
     }
   }
@@ -70,25 +120,41 @@ export class ReminderController {
   async updateReminder(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { text } = req.body;
+      const { text, telegramId } = req.body;
+      const cacheClient = this.cacheService.getClient();
+
       const promptResult = await this.aiAgentService.analyzePromptReminder({
         text,
       });
-      const cacheClient = this.cacheService.getClient();
-      const isHashExist = await cacheClient.exists(`reminders:${id}`);
+      const result = await this.reminderService.updateReminder(
+        Number(id),
+        BigInt(telegramId),
+        promptResult,
+      );
 
-      if (!isHashExist) {
+      if (!result) {
         return res
           .status(404)
           .json({ error: true, message: "Reminder not found" });
       }
 
-      await cacheClient.hSet(`reminders:${id}`, promptResult);
+      const rKey = `reminder:${id}`;
+      const isExist = await cacheClient.exists(rKey);
+
+      if (isExist) {
+        await cacheClient.hSet(rKey, {
+          id: result.id.toString(),
+          userId: result.userId.toString(),
+          title: result.title,
+          time: result.time,
+          message: promptResult.message ?? "",
+        });
+      }
 
       res.status(200).json({
         error: false,
         message: "Reminder updated successfully",
-        data: promptResult,
+        data: result,
       });
     } catch (error: any) {
       res.status(500).json({ error: true, message: error.message });
@@ -98,16 +164,26 @@ export class ReminderController {
   async deleteReminder(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      const { telegramId } = req.body;
       const cacheClient = this.cacheService.getClient();
-      const isHashExist = await cacheClient.exists(`reminders:${id}`);
 
-      if (!isHashExist) {
+      const result = await this.reminderService.deleteReminder(
+        Number(id),
+        BigInt(telegramId),
+      );
+
+      if (!result) {
         return res
           .status(404)
           .json({ error: true, message: "Reminder not found" });
       }
 
-      await cacheClient.del(`reminders:${id}`);
+      await cacheClient
+        .multi()
+        .del(`reminder:${id}`)
+        .sRem(`user:reminders:${telegramId}`, id.toString())
+        .exec();
+
       res.status(200).json({
         error: false,
         message: "Reminder deleted successfully",

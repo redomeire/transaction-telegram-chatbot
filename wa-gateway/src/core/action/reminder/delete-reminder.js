@@ -4,6 +4,7 @@ import { fetcher } from "../../../utils/api.js";
 const baseUrl = process.env.TRANSACTION_APP_API_URL;
 
 const deleteReminder = async ({
+    telegramId,
     id,
     bot,
     m
@@ -14,7 +15,8 @@ const deleteReminder = async ({
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ telegramId }),
         },
         onLoading: async () => {
             await bot.sendChatAction(m.chat.id, 'typing');
