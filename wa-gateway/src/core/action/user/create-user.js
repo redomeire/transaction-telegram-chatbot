@@ -22,7 +22,7 @@ const createUser = async ({
         },
         onSuccess: async (data) => {
             await bot.sendMessage(m.chat.id,
-                `✅ User ${data.username} berhasil dibuat! Kamu sudah siap menggunakan TRANSACTION ASSISTANT. Ketik *!help* untuk melihat daftar perintah yang tersedia.`,
+                `✅ User ${data.data.username} berhasil dibuat! Kamu sudah siap menggunakan TRANSACTION ASSISTANT. Ketik */help* untuk melihat daftar perintah yang tersedia.`,
                 {
                     parse_mode: 'Markdown'
                 }

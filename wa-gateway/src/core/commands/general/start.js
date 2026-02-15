@@ -15,22 +15,7 @@ export default class StartCommand {
       bot,
       m
     })
-    stateService.setState(chatId, {
-      cmd: this.name,
-      step: 'WAIT_USERNAME',
-      telegramId: m.from.id,
-      isUserExist: !!checkUserResult
-    })
-  }
-
-  async onReply(bot, m) {
-    const chatId = m.chat.id;
-    const username = m.text;
-    const state = stateService.getState(chatId);
-    const telegramId = state.telegramId;
-
-    if (state.isUserExist) {
-      stateService.clearState(chatId);
+    if (checkUserResult) {
       return;
     }
     const message = `Selamat datang di *TRANSACTION ASSISTANT* 🤖! Saya siap membantu mencatat keuanganmu. Mohon beritahu username anda`;
@@ -41,6 +26,18 @@ export default class StartCommand {
         selective: true
       }
     });
+    stateService.setState(chatId, {
+      cmd: this.name,
+      step: 'WAIT_USERNAME',
+      telegramId: m.from.id,
+    })
+  }
+
+  async onReply(bot, m) {
+    const chatId = m.chat.id;
+    const username = m.text;
+    const state = stateService.getState(chatId);
+    const telegramId = state.telegramId;
 
     await createUser({
       bot,

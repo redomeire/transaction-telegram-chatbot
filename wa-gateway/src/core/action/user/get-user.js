@@ -24,7 +24,7 @@ const getUser = async ({
             )
         },
         onError: async (error) => {
-            await bot.sendMessage(m.chat.id, `❌ Gagal membuat user: ${error.message}`);
+            console.error('Error fetching user:', error);
         }
     })
     return response;
