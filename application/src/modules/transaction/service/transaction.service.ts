@@ -19,6 +19,7 @@ export class TransactionService {
     this.getCategoriesByUserId = this.getCategoriesByUserId.bind(this);
     this.getUserCategoriesByTelegramId =
       this.getUserCategoriesByTelegramId.bind(this);
+    this.recapTransactions = this.recapTransactions.bind(this);
   }
   async create(data: InsertTransaction) {
     const transaction = await db
@@ -120,6 +121,37 @@ export class TransactionService {
       )
       .returning();
     return deletedIds;
+  }
+  async recapTransactions(telegramId: bigint) {
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+    );
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+    );
+
+    const transactions = await db
+      .select()
+      .from(transactionsTable)
+      .where(
+        and(
+          eq(transactionsTable.userId, telegramId),
+          between(transactionsTable.createdAt, startOfDay, endOfDay),
+        ),
+      );
+
+    return transactions;
   }
 }
 

@@ -22,6 +22,7 @@ export class TransactionController {
     this.updateTransaction = this.updateTransaction.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
     this.bulkDeleteTransactions = this.bulkDeleteTransactions.bind(this);
+    this.recapTransactions = this.recapTransactions.bind(this);
   }
   async create(req: Request, res: Response) {
     try {
@@ -123,6 +124,21 @@ export class TransactionController {
         error: false,
         message: "Transactions deleted successfully",
         data: deletedIds.map((item) => item.id.toString()),
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: true, message: error.message });
+    }
+  }
+  async recapTransactions(req: Request, res: Response) {
+    try {
+      const { telegramId } = req.params as { telegramId: string };
+      const transactions = await this.transactionService.recapTransactions(
+        BigInt(telegramId),
+      );
+      res.status(200).json({
+        error: false,
+        message: "Transactions recap generated successfully",
+        data: transactions,
       });
     } catch (error: any) {
       res.status(500).json({ error: true, message: error.message });

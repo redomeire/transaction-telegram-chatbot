@@ -8,7 +8,7 @@ class RecapTransactionCommand {
     }
 
     async execute(bot, m, ...args) {
-        await recapTransaction({ bot, m });
+        await recapTransaction({ bot, m, telegramId: m.from.id });
     }
 }
 
