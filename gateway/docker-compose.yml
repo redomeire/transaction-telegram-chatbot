@@ -1,11 +1,11 @@
 version: '3.8'
 services:
   wa-gateway:
-    image: wa-gateway-app:latest
+    image: gateway:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wa-gateway
+    container_name: gateway
     restart: always
     tty: true
     stdin_open: true
@@ -13,8 +13,6 @@ services:
       - "3000:3000"
     env_file:
       - .env
-    volumes:
-      - ./auth_info:/app/auth_info
     logging:
       driver: "json-file"
       options:

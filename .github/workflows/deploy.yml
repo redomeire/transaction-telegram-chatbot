@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'wa-gateway/**'
+      - 'gateway/**'
 
 jobs:
   deploy-vps:
@@ -24,17 +24,17 @@ jobs:
           echo "📥 Menarik kode terbaru..."
           git pull origin main
 
-          cd wa-gateway
+          cd gateway
 
           echo "🏗️ Membangun image..."
-          podman build -t wa-gateway-app:latest .
+          podman build -t gateway:latest .
 
           echo "🧹 Membersihkan container lama..."
-          podman rm -f wa-gateway || true
+          podman rm -f wa-gateway gateway || true
 
           echo "🚀 Menjalankan container..."
           podman run -d \
-            --name wa-gateway \
+            --name gateway \
             --restart always \
             --network host \
             --memory="512m" \
@@ -42,7 +42,7 @@ jobs:
             --log-opt max-size=10mb \
             --env-file .env \
             -v ./auth_info:/app/auth_info:Z \
-            wa-gateway-app:latest
+            gateway:latest
 
           podman image prune -f
 

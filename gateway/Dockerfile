@@ -12,8 +12,6 @@ COPY package.json yarn.lock .yarnrc.yml ./
 
 RUN yarn install
 
-RUN mkdir -p auth_info && chown -R node:node auth_info
-
 COPY . .
 
 RUN chown -R node:node /app
