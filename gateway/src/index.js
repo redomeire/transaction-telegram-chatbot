@@ -28,9 +28,6 @@ async function start() {
         onConnectionUpdate,
         onMessageUpsert: messageHandler
     });
-    await commandService.runStartupCommands(
-        connectionInstance.driver.client
-    );
 }
 
 await start();
