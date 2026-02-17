@@ -9,6 +9,10 @@ Tenang! Kini kamu bisa nyatet transaksi harianmu langsung dari **Telegram**! üö
 
 ---
 
+## ‚ùìMore information
+
+* **Project resource**: [Link](https://drive.google.com/drive/folders/1imuJq2fKhXOnm1cQcX0e4WSuQwinx-LE?usp=sharing)
+
 ## ‚ú® Fitur
 
 ### üí∞ Manajemen Keuangan Praktis
@@ -26,7 +30,7 @@ Tenang! Kini kamu bisa nyatet transaksi harianmu langsung dari **Telegram**! üö
 * **Node.js**: Core logic bot.
 * **Supabase**: Managed PostgreSQL untuk menyimpan data transaksi.
 * **Deepseek**: Natural Language Processing untuk memproses *command.*
-* **Redis**: Caching layer untuk performa ngebut.
+* **Redis**: Caching layer untuk kurangi beban db.
 * **Podman**: Containerized deployment agar mudah dijalankan di VPS mana saja.
 
 ---
@@ -35,19 +39,16 @@ Tenang! Kini kamu bisa nyatet transaksi harianmu langsung dari **Telegram**! üö
 
 ```mermaid
 graph TD
-    User[User Telegram] -->|Send Message| TG[Telegram Bot API]
-    TG <-->|Polling| Gateway[Gateway Engine - Node.js]
-    Gateway -->|Cek Cache| Redis{Redis Cache}
+    User[User Telegram] -->|Send Message| TG[Telegram Server]
+    TG <-->|Long Polling| Gateway[Gateway - Node.js]
+    Gateway -->|Request| API[REST API - Node.js]
+    API --> |Response| Gateway
+    API -->|Cek Cache| Redis{Redis Cache}
   
-    Redis -->|Hit| Gateway
+    Redis -->|Hit| API
     Redis -->|Miss| DB[(PostgreSQL)]
   
-    DB -->|Return Data| Gateway
-    Gateway -->|Update Cache| Redis
-    Gateway -->|Polling| TG
+    DB -->|Return Data| API
+    API -->|Update Cache| Redis
     TG -->|Reply| User
 ```
-
-### ‚ùìMore information
-
-* **Project resource**: [Link](https://drive.google.com/drive/folders/1imuJq2fKhXOnm1cQcX0e4WSuQwinx-LE?usp=sharing)
