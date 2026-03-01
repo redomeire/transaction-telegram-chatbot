@@ -20,6 +20,7 @@ export class TransactionService {
     this.getUserCategoriesByTelegramId =
       this.getUserCategoriesByTelegramId.bind(this);
     this.recapTransactions = this.recapTransactions.bind(this);
+    this.getMonthlyReport = this.getMonthlyReport.bind(this);
   }
   async create(data: InsertTransaction) {
     const transaction = await db
@@ -152,6 +153,19 @@ export class TransactionService {
       );
 
     return transactions;
+  }
+  async getMonthlyReport(telegramId: bigint) {
+    const transactions = await this.recapTransactions(telegramId);
+
+    const totalIncome = transactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpense = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    return { totalIncome, totalExpense };
   }
 }
 
