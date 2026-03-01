@@ -85,11 +85,29 @@ export class AIAgentService {
       : "";
     const prompt = `
             Anda adalah asisten pembuat cron job.
-            ${updateString}
-            Ekstrak data berikut dari teks: "title", "time" (string pengingat dalam format *), dan "message".
-            asterisk pertama adalah detik (0-59), asterisk kedua adalah menit (0-59), asterisk ketiga adalah jam (0-23), asterisk keempat adalah hari dalam bulan (1-31), asterisk kelima adalah bulan (1-12), asterisk keenam adalah hari dalam minggu (0-7) dengan 0 atau 7 adalah Minggu.
-            Format JSON yang dikembalikan: {"title": string, "time": string, "message": string}.
-            Teks: "${text}"
+${updateString}
+Ekstrak data berikut dari teks:
+- "title"
+- "time" (string cron)
+- "message"
+Format cron terdiri dari:
+detik menit jam hari_bulan bulan hari_minggu
+Asterisk pertama = detik (0-59)
+kedua = menit (0-59)
+ketiga = jam (0-23)
+keempat = hari (1-31)
+kelima = bulan (1-12)
+keenam = hari_minggu (0-7, Minggu=0 atau 7)
+ATURAN INTERPRETASI:
+- Cron harus sekali saja berjalan pada detik dan waktu tersebut 
+- Jangan gunakan * pada detik atau menit untuk waktu spesifik.
+Contoh benar:
+"setiap hari jam 10 malam" → 0 0 22 * * *
+Contoh salah:
+"setiap hari jam 10 malam" → * * 22 * * *
+Format JSON:
+{"title": string, "time": string, "message": string}
+Teks: "${text}"
         `;
 
     const data = await this.createCompletion({ prompt });
