@@ -21,7 +21,7 @@ const recapTransaction = async ({
             await bot.sendChatAction(m.chat.id, 'typing');
         },
         onSuccess: async (data) => {
-            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nRekap transaksi:\n\n${data.data.map((item, index) => `${index + 1}. 🆔 ID: ${item.id}\n📝 Nama: ${item.title}\n💰 Jumlah: ${rupiahFormatter(item.amount)}\n📅 Tanggal: ${dateformatter(item.createdAt)}\n`).join('\n\n')}`);
+            await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nRekap transaksi hari ini:\n\n${data.data.map((item, index) => `${index + 1}. 🆔 ID: ${item.id}\n📝 Nama: ${item.title}\n💰 Jumlah: ${rupiahFormatter(item.amount)}\n📅 Tanggal: ${dateformatter(item.createdAt)}\n`).join('\n\n')}`);
         },
         onError: async (error) => {
             await bot.sendMessage(m.chat.id, `🤖[Bot Transaction] \n\nGagal mengambil rekap transaksi. \n\nError: ${error.message || 'Unknown error'}`)
