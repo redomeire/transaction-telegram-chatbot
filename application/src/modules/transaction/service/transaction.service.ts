@@ -155,8 +155,7 @@ export class TransactionService {
     return transactions;
   }
   async getMonthlyReport(telegramId: bigint) {
-    const transactions = await this.recapTransactions(telegramId);
-
+    const transactions = await this.getByUserId(telegramId);
     const totalIncome = transactions
       .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
