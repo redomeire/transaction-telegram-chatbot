@@ -155,16 +155,27 @@ export class TransactionService {
     return transactions;
   }
   async getMonthlyReport(telegramId: bigint) {
-    const transactions = await this.getByUserId(telegramId);
-    const totalIncome = transactions
-      .filter((t) => t.type === "income")
-      .reduce((sum, t) => sum + t.amount, 0);
+    const result = await db
+      .select({
+        totalIncome:
+          sql<number>`COALESCE(SUM(${transactionsTable.amount}) FILTER (WHERE ${transactionsTable.type} = 'income'), 0)`.mapWith(
+            Number,
+          ),
+        totalExpense:
+          sql<number>`COALESCE(SUM(${transactionsTable.amount}) FILTER (WHERE ${transactionsTable.type} = 'expense'), 0)`.mapWith(
+            Number,
+          ),
+      })
+      .from(transactionsTable)
+      .where(
+        and(
+          eq(transactionsTable.userId, telegramId),
+          sql`${transactionsTable.createdAt} >= date_trunc('month', now())`,
+          sql`${transactionsTable.createdAt} < date_trunc('month', now()) + interval '1 month'`,
+        ),
+      );
 
-    const totalExpense = transactions
-      .filter((t) => t.type === "expense")
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    return { totalIncome, totalExpense };
+    return result[0];
   }
 }
 
